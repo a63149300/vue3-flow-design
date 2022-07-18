@@ -1,13 +1,13 @@
 export const tools = [
 	{
 		type: 'drag',
-		icon: 'drag',
-		name: '拖拽'
+		name: '拖拽',
+    icon: 'DragOutlined',
 	},
 	{
 		type: 'connection',
-		icon: 'fork',
-		name: '连线'
+		name: '连线',
+    icon: 'ForkOutlined',
 	},
 ];
 
@@ -15,32 +15,32 @@ export const commonNodes = [
 	{
 		type: 'start',
 		nodeName: '开始',
-		icon: 'play-circle'
+		icon: 'PlayCircleOutlined'
 	},
 	{
 		type: 'common',
 		nodeName: '人工节点',
-		icon: 'user'
+		icon: 'UserOutlined'
 	},
 	{
 		type: 'freedom',
 		nodeName: '自动节点',
-		icon: 'sync'
+		icon: 'SyncOutlined'
 	},
 	{
 		type: 'gateway',
 		nodeName: '网关',
-		icon: 'gateway'
+		icon: 'GatewayOutlined'
 	},
 	{
 		type: 'event',
 		nodeName: '事件',
-		icon: 'select'
+		icon: 'SelectOutlined'
 	},
   {
 		type: 'end',
 		nodeName: '结束',
-		icon: 'stop'
+		icon: 'StopOutlined'
 	},
 ];
 
@@ -48,7 +48,7 @@ export const highNodes = [
 	{
 		type: 'child-flow',
 		nodeName: '子流程',
-		icon: 'apartment'
+		icon: 'ApartmentOutlined'
 	}
 ];
 
@@ -56,11 +56,11 @@ export const laneNodes = [
 	{
 		type: 'x-lane',
 		nodeName: '横向泳道',
-		icon: 'column-width'
+		icon: 'ColumnWidthOutlined'
 	},
 	{
 		type: 'y-lane',
 		nodeName: '纵向泳道',
-		icon: 'column-height'
+		icon: 'ColumnHeightOutlined'
 	}
 ];

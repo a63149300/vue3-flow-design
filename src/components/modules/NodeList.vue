@@ -10,9 +10,12 @@
   </a-list>
 </template>
 <script lang="ts" setup>
+import { PropType } from 'vue';
+import { IElement } from '../config/basic-node-config'
+
 const props = defineProps({
   nodeList: {
-    type: Array,
+    type: Array as PropType<IElement[]>,
     default: () => [],
   },
   type: {
@@ -24,7 +27,7 @@ const props = defineProps({
 const emits = defineEmits(["setDragInfo"]);
 
 // 开始拖拽
-function dragNode(type, belongTo) {
+function dragNode(type: string, belongTo: string) {
   emits("setDragInfo", {
     type,
     belongTo,

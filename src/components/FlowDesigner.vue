@@ -17,9 +17,10 @@
       </a-layout-sider>
       <a-layout>
         <a-layout-header class="header-option">
+          <!-- 操作区 -->
           <div class="header-option__tools">
             <span v-for="tool in field.tools" :key="tool.type">
-              <a-tooltip :title="tool.name" placement="right">
+              <a-tooltip :title="tool.nodeName" placement="right">
                 <a-button size="small" :type="currentTool.type === tool.type ? 'primary' : 'default'" @click="null">
                   <template #icon>
                     <component :is="tool.icon" />
@@ -28,6 +29,7 @@
               </a-tooltip>
             </span>
           </div>
+          <!-- 工具区 -->
           <div class="header-option__buttons">
             <a-tooltip title="保存流程" placement="bottom">
               <a-button @click="null" class="header-option-button" size="small">
@@ -90,7 +92,12 @@
             </a-tooltip>
           </div>
         </a-layout-header>
-        <a-layout-content class="content"></a-layout-content>
+        <a-layout-content class="content">
+          <flow-area ref="flowArea" :dragInfo="dragInfo" :browserType="browserType" :flowData="flowData"
+            :select.sync="currentSelect" :selectGroup.sync="currentSelectGroup" :plumb="plumb"
+            :currentTool="currentTool" @findNodeConfig="null" @selectTool="null" @getShortcut="null" @saveFlow="null">
+          </flow-area>
+        </a-layout-content>
         <a-layout-footer class="foot">
           <span>Vue3-Flow-Design 1.0.0 , Powered by 前端爱码士</span>
         </a-layout-footer>
@@ -101,46 +108,63 @@
   </div>
 </template>
 
-<script lang="ts"
-        setup>
-        import jsplumb from 'jsplumb'
-        import NodeList from './modules/NodeList.vue'
-        import { tools, commonNodes, highNodes, laneNodes } from './config/basic-node-config'
-        import { flowConfig } from "./config/args-config";
-        import { reactive, ref } from 'vue'
-        
-        const field = reactive({
-          tools: tools,
-          commonNodes: commonNodes,
-          highNodes: highNodes,
-          laneNodes: laneNodes,
-        })
-        
-        const currentTool = reactive({
-          type: "drag",
-          icon: "drag",
-          name: "拖拽"
-        })
-        
-        const flowData = reactive({
-          nodeList: [],
-          linkList: [],
-          attr: {
-            id: ""
-          },
-          config: {
-            showGrid: true,
-            showGridText: "隐藏网格",
-            showGridIcon: "EyeOutlined"
-          },
-          status: flowConfig.flowStatus.CREATE,
-          remarks: []
-        })
-        
-        const dragInfo = ref()
-        
-        // 设置dragInfo
-        function setDragInfo(info) {
-          dragInfo.value = info
-        }
-        </script>
+<script lang="ts" setup>
+import jsplumb from 'jsplumb'
+import { reactive, ref } from 'vue'
+import NodeList from './modules/NodeList.vue'
+import FlowArea from "./modules/FlowArea.vue";
+import { tools, commonNodes, highNodes, laneNodes } from './config/basic-node-config'
+import { flowConfig } from "./config/args-config";
+import { IDragInfo } from './type'
+
+const browserType = 3;
+const plumb = {};
+const field = reactive({
+  tools: tools,
+  commonNodes: commonNodes,
+  highNodes: highNodes,
+  laneNodes: laneNodes,
+})
+
+const currentTool = reactive({
+  type: "drag",
+  icon: "drag",
+  name: "拖拽"
+})
+
+const flowData = reactive({
+  nodeList: [],
+  linkList: [],
+  attr: {
+    id: ""
+  },
+  config: {
+    showGrid: true,
+    showGridText: "隐藏网格",
+    showGridIcon: "EyeOutlined"
+  },
+  status: flowConfig.flowStatus.CREATE,
+  remarks: []
+})
+
+const currentSelect = {};
+const currentSelectGroup = [];
+const activeShortcut = true; // 画布聚焦开启快捷键
+const linkContextMenuData = flowConfig.contextMenu.link;
+const flowPicture = {
+  url: "",
+  modalVisible: false,
+  closable: false,
+  maskClosable: false
+};
+const dragInfo = reactive<IDragInfo>({
+  type: "",
+  belongTo: ""
+});
+
+// 设置dragInfo
+function setDragInfo(info: IDragInfo) {
+  dragInfo.type = info.type;
+  dragInfo.belongTo = info.belongTo;
+}
+</script>

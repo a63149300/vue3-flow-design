@@ -1,17 +1,23 @@
-export const tools = [
+export interface IElement {
+  type: string;
+  nodeName: string;
+  icon: string;
+}
+
+export const tools: IElement[] = [
 	{
 		type: 'drag',
-		name: '拖拽',
+		nodeName: '拖拽',
     icon: 'DragOutlined',
 	},
 	{
 		type: 'connection',
-		name: '连线',
+		nodeName: '连线',
     icon: 'ForkOutlined',
 	},
 ];
 
-export const commonNodes = [
+export const commonNodes: IElement[] = [
 	{
 		type: 'start',
 		nodeName: '开始',
@@ -44,7 +50,7 @@ export const commonNodes = [
 	},
 ];
 
-export const highNodes = [
+export const highNodes: IElement[] = [
 	{
 		type: 'child-flow',
 		nodeName: '子流程',
@@ -52,7 +58,7 @@ export const highNodes = [
 	}
 ];
 
-export const laneNodes = [
+export const laneNodes: IElement[] = [
 	{
 		type: 'x-lane',
 		nodeName: '横向泳道',

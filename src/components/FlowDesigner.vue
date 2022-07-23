@@ -115,23 +115,21 @@
             :dragInfo="dragInfo"
             :browserType="browserType"
             :flowData="flowData"
-            :select.sync="currentSelect"
-            :selectGroup.sync="currentSelectGroup"
+            v-model:select="currentSelect"
+            v-model:selectGroup="currentSelectGroup"
             :plumb="plumb"
             :currentTool="currentTool"
             @findNodeConfig="null"
             @selectTool="null"
             @getShortcut="null"
             @saveFlow="null"
-          >
-          </flow-area>
+          />
         </a-layout-content>
         <a-layout-footer class="foot">
           <span>Vue3-Flow-Design 1.0.0 , Powered by 前端爱码士</span>
         </a-layout-footer>
       </a-layout>
-      <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="null">
-      </a-layout-sider>
+      <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="null" />
     </a-layout>
   </div>
 </template>

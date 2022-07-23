@@ -13,7 +13,7 @@
   import { PropType } from 'vue';
   import { IElement } from '../config/basic-node-config';
 
-  const props = defineProps({
+  defineProps({
     nodeList: {
       type: Array as PropType<IElement[]>,
       default: () => [],

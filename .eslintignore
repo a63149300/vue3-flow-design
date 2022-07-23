@@ -13,3 +13,5 @@ dist
 .local
 /bin
 Dockerfile
+index.html
+

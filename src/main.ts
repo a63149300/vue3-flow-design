@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { registerAntdComp } from '/@/antd';
+import { registerAntdComp } from './antd';
 import * as antIcons from '@ant-design/icons-vue'
 import 'ant-design-vue/dist/antd.less';
 import '/@/components/style/index.less'

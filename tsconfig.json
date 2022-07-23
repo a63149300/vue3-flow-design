@@ -16,6 +16,7 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
+    "noImplicitAny": false,
     "skipLibCheck": true,
     "types": ["vite/client"],
     "removeComments": true,

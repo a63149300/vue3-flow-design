@@ -3,7 +3,7 @@
     <a-list-item v-for="node in nodeList" :key="node.type">
       <a-tooltip :title="node.nodeName" placement="right">
         <div class="node-item" draggable="true" @dragstart="dragNode(node.type, type)">
-          <component :is="$antIcons[node.icon]" />
+          <component :is="node.icon" />
         </div>
       </a-tooltip>
     </a-list-item>

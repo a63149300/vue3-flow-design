@@ -1,5 +1,5 @@
 <template>
-  <flow-designer></flow-designer>
+  <flow-designer />
 </template>
 
 <script setup lang="ts">

@@ -3,7 +3,7 @@ import App from './App.vue';
 import { registerAntdComp } from './antd';
 import * as antIcons from '@ant-design/icons-vue';
 import 'ant-design-vue/dist/antd.less';
-import '/@/components/style/index.less';
+import '/@/components/assets/style/index.less';
 
 const app = createApp(App);
 

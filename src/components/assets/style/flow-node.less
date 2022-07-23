@@ -1,6 +1,6 @@
 @common-node-bg: #f4f6fc;
 @common-node-bg-hover: #f4f6fcb0;
-@common-node-active: #409EFF;
+@common-node-active: #409eff;
 
 .common-circle-node {
   position: absolute;
@@ -20,7 +20,7 @@
 
   &.active {
     outline: 2px dashed @common-node-active;
-    outline-offset: 0px;
+    outline-offset: 0;
   }
 
   &.isStart {
@@ -52,7 +52,7 @@
 
   &.active {
     outline: 2px dashed @common-node-active;
-    outline-offset: 0px;
+    outline-offset: 0;
   }
 }
 
@@ -68,7 +68,7 @@
   transform: rotate(45deg);
   white-space: nowrap;
 
-  &:before {
+  &::before {
     position: absolute;
     content: '网关';
     transform: rotate(-45deg);
@@ -85,7 +85,7 @@
 
   &.active {
     outline: 2px dashed @common-node-active;
-    outline-offset: 0px;
+    outline-offset: 0;
   }
 }
 
@@ -98,7 +98,7 @@
 
   &.active {
     outline: 2px dashed @common-node-active;
-    outline-offset: 0px;
+    outline-offset: 0;
   }
 
   .lane-text-div {
@@ -131,7 +131,7 @@
 
   &.active {
     outline: 2px dashed @common-node-active;
-    outline-offset: 0px;
+    outline-offset: 0;
   }
 
   .lane-text-div {

@@ -24,7 +24,7 @@
                 <a-button
                   size="small"
                   :type="currentTool.type === tool.type ? 'primary' : 'default'"
-                  @click="null"
+                  @click="selectTool(tool.type)"
                 >
                   <template #icon>
                     <component :is="tool.icon" />
@@ -135,16 +135,19 @@
 </template>
 
 <script lang="ts" setup>
-  import jsplumb from 'jsplumb';
-  import { reactive, ref } from 'vue';
+  import { jsPlumb, Defaults } from 'jsplumb';
+  import { reactive, ref, onMounted } from 'vue';
+  import { message } from 'ant-design-vue';
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
-  import { tools, commonNodes, highNodes, laneNodes } from './config/basic-node-config';
+  import { tools, commonNodes, highNodes, laneNodes, IElement } from './config/basic-node-config';
   import { flowConfig } from './config/args-config';
   import { IDragInfo } from './type';
+  import { ToolsTypeEnum } from './config/enums';
+  import { utils } from './utils/common';
 
   const browserType = 3;
-  const plumb = {};
+  const plumb = ref<any>({});
   const field = reactive({
     tools: tools,
     commonNodes: commonNodes,
@@ -152,13 +155,9 @@
     laneNodes: laneNodes,
   });
 
-  const currentTool = reactive({
-    type: 'drag',
-    icon: 'drag',
-    name: '拖拽',
-  });
+  const currentTool = ref<IElement>(tools[0]);
 
-  const flowData = reactive({
+  const flowData = reactive<Recordable>({
     nodeList: [],
     linkList: [],
     attr: {
@@ -173,8 +172,8 @@
     remarks: [],
   });
 
-  const currentSelect = {};
-  const currentSelectGroup = [];
+  const currentSelect = ref({});
+  const currentSelectGroup = ref([]);
   const activeShortcut = true; // 画布聚焦开启快捷键
   const linkContextMenuData = flowConfig.contextMenu.link;
   const flowPicture = {
@@ -189,9 +188,137 @@
     belongTo: '',
   });
 
+  // 实例化JsPlumb
+  function initJsPlumb() {
+    plumb.value = jsPlumb.getInstance(flowConfig.jsPlumbInsConfig);
+
+    plumb.value.bind('beforeDrop', (info) => {
+      let sourceId = info.sourceId;
+      let targetId = info.targetId;
+
+      if (sourceId === targetId) return false;
+      let filter = flowData.linkList.filter(
+        (link: Recordable) => link.sourceId === sourceId && link.targetId === targetId,
+      );
+      if (filter.length > 0) {
+        message.error('同方向的两节点连线只能有一条！');
+        return false;
+      }
+      return true;
+    });
+
+    plumb.value.bind('connection', (conn: Recordable) => {
+      let connObj = conn.connection.canvas;
+      let o: Recordable = {};
+      let id = '';
+      let label = '';
+      if (
+        flowData.status === flowConfig.flowStatus.CREATE ||
+        flowData.status === flowConfig.flowStatus.MODIFY
+      ) {
+        id = 'link-' + utils.getId();
+        label = '';
+      } else if (flowData.status === flowConfig.flowStatus.LOADING) {
+        let l = flowData.linkList[flowData.linkList.length - 1];
+        id = l.id;
+        label = l.label;
+      }
+      connObj.id = id;
+      o.type = 'link';
+      o.id = id;
+      o.sourceId = conn.sourceId;
+      o.targetId = conn.targetId;
+      o.label = label;
+      o.cls = {
+        linkType: flowConfig.jsPlumbInsConfig.Connector[0],
+        linkColor: flowConfig.jsPlumbInsConfig.PaintStyle.stroke,
+        linkThickness: flowConfig.jsPlumbInsConfig.PaintStyle.strokeWidth,
+      };
+      document.querySelector('#' + id)!.addEventListener('contextmenu', (e) => {
+        showLinkContextMenu(e);
+        currentSelect.value = flowData.linkList.find((l: Recordable) => l.id === id);
+      });
+
+      document.querySelector('#' + id)!.addEventListener('click', (e) => {
+        let event = window.event || e;
+        event.stopPropagation();
+        currentSelect.value = flowData.linkList.find((l: Recordable) => l.id === id);
+      });
+
+      if (flowData.status !== flowConfig.flowStatus.LOADING) flowData.linkList.push(o);
+    });
+
+    plumb.value.importDefaults({
+      ConnectionsDetachable: flowConfig.jsPlumbConfig.conn.isDetachable,
+    });
+  }
+
+  // 连接线右键
+  function showLinkContextMenu(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    let flowMenu = document.querySelector('.vue-contextmenuName-flow-menu') as HTMLElement;
+    flowMenu.style.display = 'none';
+    let nodeMenu = document.querySelector('.vue-contextmenuName-node-menu') as HTMLElement;
+    nodeMenu.style.display = 'none';
+    let x = event.clientX;
+    let y = event.clientY;
+    linkContextMenuData.axis = { x, y };
+  }
+
+  // 设置工具
+  function selectTool(type: string) {
+    let tool = tools.find((t) => t.type === type);
+    if (tool) currentTool.value = tool;
+
+    switch (type) {
+      case ToolsTypeEnum.DRAG:
+        changeToDrag();
+        break;
+      case ToolsTypeEnum.CONNECTION:
+        changeToConnection();
+        break;
+    }
+  }
+
+  // 切换为拖拽
+  function changeToDrag() {
+    flowData.nodeList.forEach((node) => {
+      let f = plumb.value.toggleDraggable(node.id);
+      if (!f) {
+        plumb.value.toggleDraggable(node.id);
+      }
+      if (node.type !== 'x-lane' && node.type !== 'y-lane') {
+        plumb.value.unmakeSource(node.id);
+        plumb.value.unmakeTarget(node.id);
+      }
+    });
+  }
+
+  // 切换为连线
+  function changeToConnection() {
+    flowData.nodeList.forEach((node) => {
+      let f = plumb.value.toggleDraggable(node.id);
+      if (f) {
+        plumb.value.toggleDraggable(node.id);
+      }
+      if (node.type !== 'x-lane' && node.type !== 'y-lane') {
+        plumb.value.makeSource(node.id, flowConfig.jsPlumbConfig.makeSourceConfig);
+        plumb.value.makeTarget(node.id, flowConfig.jsPlumbConfig.makeTargetConfig);
+      }
+    });
+
+    currentSelect.value = {};
+    currentSelectGroup.value = [];
+  }
+
   // 设置dragInfo
   function setDragInfo(info: IDragInfo) {
     dragInfo.type = info.type;
     dragInfo.belongTo = info.belongTo;
   }
+
+  onMounted(() => {
+    initJsPlumb();
+  });
 </script>

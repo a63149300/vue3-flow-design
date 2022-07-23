@@ -157,8 +157,8 @@ export const flowConfig = {
     container: {
       menuName: 'flow-menu',
       axis: {
-        x: null,
-        y: null,
+        x: 0,
+        y: 0,
       },
       menulists: [
         {
@@ -227,8 +227,8 @@ export const flowConfig = {
     node: {
       menuName: 'node-menu',
       axis: {
-        x: null,
-        y: null,
+        x: 0,
+        y: 0,
       },
       menulists: [
         {
@@ -246,8 +246,8 @@ export const flowConfig = {
     link: {
       menuName: 'link-menu',
       axis: {
-        x: null,
-        y: null,
+        x: 0,
+        y: 0,
       },
       menulists: [
         {

@@ -1,3 +1,4 @@
+import { ToolsTypeEnum } from './enums';
 export interface IElement {
   type: string;
   nodeName: string;
@@ -6,12 +7,12 @@ export interface IElement {
 
 export const tools: IElement[] = [
   {
-    type: 'drag',
+    type: ToolsTypeEnum.DRAG,
     nodeName: '拖拽',
     icon: 'DragOutlined',
   },
   {
-    type: 'connection',
+    type: ToolsTypeEnum.CONNECTION,
     nodeName: '连线',
     icon: 'ForkOutlined',
   },

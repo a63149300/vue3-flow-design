@@ -111,7 +111,7 @@
         </a-layout-header>
         <a-layout-content class="content">
           <flow-area
-            ref="flowArea"
+            ref="flowCanvas"
             :dragInfo="dragInfo"
             :browserType="browserType"
             :flowData="flowData"
@@ -119,8 +119,8 @@
             v-model:selectGroup="currentSelectGroup"
             :plumb="plumb"
             :currentTool="currentTool"
-            @findNodeConfig="null"
-            @selectTool="null"
+            @findNodeConfig="findNodeConfig"
+            @selectTool="selectTool"
             @getShortcut="null"
             @saveFlow="null"
           />
@@ -157,6 +157,8 @@
 
   const currentTool = ref<IElement>(tools[0]);
 
+  const flowCanvas = ref<Nullable<HTMLElement>>(null);
+
   const flowData = reactive<Recordable>({
     nodeList: [],
     linkList: [],
@@ -174,7 +176,7 @@
 
   const currentSelect = ref({});
   const currentSelectGroup = ref([]);
-  const activeShortcut = true; // 画布聚焦开启快捷键
+  let activeShortcut = true; // 画布聚焦开启快捷键
   const linkContextMenuData = flowConfig.contextMenu.link;
   const flowPicture = {
     url: '',
@@ -190,7 +192,7 @@
 
   // 实例化JsPlumb
   function initJsPlumb() {
-    plumb.value = jsPlumb.getInstance(flowConfig.jsPlumbInsConfig);
+    plumb.value = jsPlumb.getInstance(flowConfig.jsPlumbInsConfig as unknown as Defaults);
 
     plumb.value.bind('beforeDrop', (info) => {
       let sourceId = info.sourceId;
@@ -318,7 +320,135 @@
     dragInfo.belongTo = info.belongTo;
   }
 
+  // 键盘移动节点
+  function moveNode(type: string) {
+    let m = flowConfig.defaultStyle.movePx,
+      isX = true;
+    switch (type) {
+      case 'left':
+        m = -m;
+        break;
+      case 'up':
+        m = -m;
+        isX = false;
+        break;
+      case 'right':
+        break;
+      case 'down':
+        isX = false;
+    }
+
+    if (currentSelectGroup.value.length > 0) {
+      currentSelectGroup.value.forEach((node) => {
+        if (isX) {
+          node.x += m;
+        } else {
+          node.y += m;
+        }
+      });
+      plumb.value.repaintEverything();
+    } else if (currentSelect.value.id) {
+      if (isX) {
+        currentSelect.value.x += m;
+      } else {
+        currentSelect.value.y += m;
+      }
+      plumb.value.repaintEverything();
+    }
+  }
+
+  // 初始化快捷键
+  function listenShortcut() {
+    document.onkeydown = (e) => {
+      let event = window.event || e;
+
+      // 画布聚焦开启快捷键
+      if (!activeShortcut) return;
+      let key = event.keyCode;
+
+      switch (key) {
+        case flowConfig.shortcut.multiple.code:
+          flowCanvas.value.rectangleMultiple.flag = true;
+          break;
+        case flowConfig.shortcut.dragContainer.code:
+          flowCanvas.value.container.dragFlag = true;
+          break;
+        case flowConfig.shortcut.scaleContainer.code:
+          flowCanvas.value.container.scaleFlag = true;
+          break;
+        case flowConfig.shortcut.dragTool.code:
+          selectTool('drag');
+          break;
+        case flowConfig.shortcut.connTool.code:
+          selectTool('connection');
+          break;
+        case flowConfig.shortcut.leftMove.code:
+          moveNode('left');
+          break;
+        case flowConfig.shortcut.upMove.code:
+          moveNode('up');
+          break;
+        case flowConfig.shortcut.rightMove.code:
+          moveNode('right');
+          break;
+        case flowConfig.shortcut.downMove.code:
+          moveNode('down');
+          break;
+      }
+
+      if (event.ctrlKey) {
+        if (event.altKey) {
+          switch (key) {
+            case flowConfig.shortcut.settingModal.code:
+              setting();
+              break;
+            case flowConfig.shortcut.testModal.code:
+              openTest();
+              break;
+          }
+        }
+      }
+    };
+    // 拖拽、缩放、多选快捷键复位
+    document.onkeyup = (e) => {
+      let event = window.event || e;
+
+      let key = event.keyCode;
+      if (key === flowConfig.shortcut.dragContainer.code) {
+        flowCanvas.value.container.dragFlag = false;
+      } else if (key === flowConfig.shortcut.scaleContainer.code) {
+        event.preventDefault();
+        flowCanvas.value.container.scaleFlag = false;
+      } else if (key === flowConfig.shortcut.multiple.code) {
+        flowCanvas.value.rectangleMultiple.flag = false;
+      }
+    };
+  }
+
+  // 查找相关节点
+  function findNodeConfig(belongTo, type, callback) {
+    let node: IElement | undefined;
+    switch (belongTo) {
+      case 'commonNodes':
+        node = commonNodes.find((n) => n.type === type);
+        break;
+      case 'highNodes':
+        node = highNodes.find((n) => n.type === type);
+        break;
+      case 'laneNodes':
+        node = laneNodes.find((n) => n.type === type);
+        break;
+      default:
+        node = undefined;
+    }
+    callback(node);
+    console.log(flowData);
+  }
+
   onMounted(() => {
+    // 实例化JsPlumb
     initJsPlumb();
+    // 初始化快捷键
+    listenShortcut();
   });
 </script>

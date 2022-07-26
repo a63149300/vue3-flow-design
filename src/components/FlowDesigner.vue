@@ -36,7 +36,7 @@
           <!-- 工具区 -->
           <div class="header-option__buttons">
             <a-tooltip title="保存流程" placement="bottom">
-              <a-button @click="null" class="header-option-button" size="small">
+              <a-button @click="saveFlow" class="header-option-button" size="small">
                 <template #icon>
                   <SaveOutlined />
                 </template>
@@ -54,7 +54,7 @@
               placement="bottom"
               okText="确认"
               cancelText="取消"
-              @confirm="null"
+              @confirm="clear"
             >
               <a-tooltip title="重新绘制" placement="bottom">
                 <a-button class="header-option-button" size="small">
@@ -65,7 +65,7 @@
               </a-tooltip>
             </a-popconfirm>
             <a-tooltip :title="flowData.config.showGridText" placement="bottom">
-              <a-button @click="null" class="header-option-button" size="small">
+              <a-button @click="toggleShowGrid" class="header-option-button" size="small">
                 <component :is="flowData.config.showGridIcon" />
               </a-button>
             </a-tooltip>
@@ -121,15 +121,17 @@
             :currentTool="currentTool"
             @findNodeConfig="findNodeConfig"
             @selectTool="selectTool"
-            @getShortcut="null"
-            @saveFlow="null"
+            @getShortcut="getShortcut"
+            @saveFlow="saveFlow"
           />
         </a-layout-content>
         <a-layout-footer class="foot">
           <span>Vue3-Flow-Design 1.0.0 , Powered by 前端爱码士</span>
         </a-layout-footer>
       </a-layout>
-      <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="null" />
+      <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
+        <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
+      </a-layout-sider>
     </a-layout>
   </div>
 </template>
@@ -140,6 +142,7 @@
   import { message } from 'ant-design-vue';
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
+  import FlowAttr from './modules/FlowAttr.vue';
   import { tools, commonNodes, highNodes, laneNodes, IElement } from './config/basic-node-config';
   import { flowConfig } from './config/args-config';
   import { IDragInfo } from './type';
@@ -314,6 +317,38 @@
     currentSelectGroup.value = [];
   }
 
+  // 检测流程数据有效性
+  function checkFlow() {
+    let nodeList = flowData.nodeList;
+
+    if (nodeList.length <= 0) {
+      message.error('流程图中无任何节点！');
+      return false;
+    }
+    return true;
+  }
+
+  // 保存流程
+  function saveFlow() {
+    let flowObj = Object.assign({}, flowData);
+
+    if (!checkFlow()) return;
+    flowObj.status = flowConfig.flowStatus.SAVE;
+    let d = JSON.stringify(flowObj);
+    message.success('保存流程成功！请查看控制台。');
+    return d;
+  }
+
+  // 设置快捷键失效
+  function loseShortcut() {
+    activeShortcut = false;
+  }
+
+  // 设置快捷键启用
+  function getShortcut() {
+    activeShortcut = true;
+  }
+
   // 设置dragInfo
   function setDragInfo(info: IDragInfo) {
     dragInfo.type = info.type;
@@ -443,6 +478,32 @@
     }
     callback(node);
     console.log(flowData);
+  }
+
+  // 清除画布
+  function clear() {
+    flowData.nodeList.forEach((node) => {
+      plumb.value.remove(node.id);
+    });
+    currentSelect.value = {};
+    currentSelectGroup.value = [];
+    flowData.nodeList = [];
+    flowData.linkList = [];
+    flowData.remarks = [];
+  }
+
+  // 显示隐藏网格
+  function toggleShowGrid() {
+    let flag = flowData.config.showGrid;
+    if (flag) {
+      flowData.config.showGrid = false;
+      flowData.config.showGridText = '显示网格';
+      flowData.config.showGridIcon = 'eye-invisible';
+    } else {
+      flowData.config.showGrid = true;
+      flowData.config.showGridText = '隐藏网格';
+      flowData.config.showGridIcon = 'eye';
+    }
   }
 
   onMounted(() => {

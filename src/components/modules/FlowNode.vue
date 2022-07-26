@@ -32,7 +32,7 @@
     @click.stop="selectNode"
     @contextmenu.stop="showNodeContextMenu"
   >
-    <a-icon :type="setIcon(node.type)" class="node-icon" />
+    <component :is="setIcon(node.type)" class="node-icon" />
     {{ node.nodeName }}
   </div>
 
@@ -118,16 +118,16 @@
   let currentSelectGroup = ref(props.selectGroup);
 
   // 设置ICON
-  function setIcon(type) {
+  function setIcon(type: string) {
     switch (type) {
       case 'common':
-        return 'user';
+        return 'UserOutlined';
       case 'freedom':
-        return 'sync';
+        return 'SyncOutlined';
       case 'child-flow':
-        return 'apartment';
+        return 'ApartmentOutlined';
       default:
-        return 'tool';
+        return 'ToolOutlined';
     }
   }
   // 设置鼠标样式

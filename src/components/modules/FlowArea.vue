@@ -759,24 +759,27 @@
   watch(
     () => props.select,
     (val) => {
+      console.log('FlowArea:select', val);
       currentSelect.value = val;
       // 清除连接线焦点
       if (tempLinkId.value !== '') {
-        document.querySelector('#' + tempLinkId.value).classList.remove('link-active');
+        document.querySelector('#' + tempLinkId.value)?.classList.remove('link-active');
         tempLinkId.value = '';
       }
       // 设置连接线焦点
       if (unref(currentSelect).type === 'link') {
         tempLinkId.value = unref(currentSelect).id;
-        document.querySelector('#' + unref(currentSelect).id).classList.add('link-active');
+        document.querySelector('#' + unref(currentSelect).id)?.classList.add('link-active');
       }
     },
+    { deep: true },
   );
 
   watch(
     () => currentSelect,
-    (val) => {
-      emits('update:select', val);
+    (currentSelect) => {
+      console.log('FlowArea:currentSelect', currentSelect);
+      emits('update:select', currentSelect.value);
     },
     { deep: true },
   );
@@ -791,8 +794,8 @@
 
   watch(
     () => currentSelectGroup,
-    (val) => {
-      emits('update:selectGroup', val);
+    (currentSelectGroup) => {
+      emits('update:selectGroup', currentSelectGroup.value);
     },
     { deep: true },
   );

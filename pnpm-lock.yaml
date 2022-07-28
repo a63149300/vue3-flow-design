@@ -27,6 +27,7 @@ specifiers:
   stylelint-config-standard: ^25.0.0
   stylelint-order: ^5.0.0
   typescript: ^4.6.4
+  v-contextmenu: ^3.0.0
   vite: ^3.0.0
   vue: ^3.2.37
   vue-eslint-parser: ^8.0.1
@@ -37,6 +38,7 @@ dependencies:
   ant-design-vue: 3.2.10_vue@3.2.37
   jsplumb: 2.15.6
   resizable-dom: 1.0.2
+  v-contextmenu: 3.0.0_vue@3.2.37
   vue: 3.2.37
 
 devDependencies:
@@ -2538,6 +2540,15 @@ packages:
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: true
+
+  /v-contextmenu/3.0.0_vue@3.2.37:
+    resolution: {integrity: sha512-zi38JxmTt66TmljgV1JbfEa9WvoQkpzRuEwZK7Tjb2XoRejbWLozQtkyTWXJa6x6Y3FrVDfgT36w01gpTpo41A==}
+    engines: {node: '>=10.16.0'}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      vue: 3.2.37
+    dev: false
 
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}

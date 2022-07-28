@@ -227,14 +227,17 @@
   watch(
     () => props.select,
     (val) => {
+      console.log('FlowNode:select', val);
       currentSelect.value = val;
     },
+    { deep: true },
   );
 
   watch(
     () => currentSelect,
-    (val) => {
-      emits('update:select', val);
+    (currentSelect) => {
+      console.log('FlowNode:currentSelect', currentSelect.value);
+      emits('update:select', currentSelect.value);
     },
     { deep: true },
   );
@@ -248,10 +251,9 @@
 
   watch(
     () => currentSelectGroup,
-    (val) => {
-      emits('update:selectGroup', val);
+    (currentSelectGroup) => {
+      emits('update:selectGroup', currentSelectGroup.value);
     },
-    { deep: true },
   );
 
   onMounted(() => {

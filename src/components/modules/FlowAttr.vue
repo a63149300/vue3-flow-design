@@ -186,7 +186,17 @@
   import { ref, watch, unref } from 'vue';
   import { ClusterOutlined, ProfileOutlined, BranchesOutlined } from '@ant-design/icons-vue';
 
-  const props = defineProps(['plumb', 'flowData', 'select']);
+  const props = defineProps({
+    plumb: {
+      type: Object,
+    },
+    flowData: {
+      type: Object,
+    },
+    select: {
+      type: Object,
+    },
+  });
 
   const emits = defineEmits(['update:select']);
 
@@ -231,21 +241,24 @@
   watch(
     () => props.select,
     (val) => {
+      console.log('FlowAttr:select', val);
       currentSelect.value = val;
-      if (unref(currentSelect).type === 'link') {
+      if (unref(currentSelect)?.type === 'link') {
         activeKey.value = 'link-attr';
-      } else if (!unref(currentSelect).type) {
+      } else if (!unref(currentSelect)?.type) {
         activeKey.value = 'flow-attr';
       } else {
         activeKey.value = 'node-attr';
       }
     },
+    { deep: true },
   );
 
   watch(
     () => currentSelect,
-    (val) => {
-      emits('update:select', val);
+    (currentSelect) => {
+      console.log('FlowAttr:select', currentSelect);
+      emits('update:select', currentSelect.value);
     },
     { deep: true },
   );

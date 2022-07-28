@@ -12,6 +12,7 @@
     "ant-design-vue": "^3.2.10",
     "jsplumb": "^2.15.6",
     "resizable-dom": "^1.0.2",
+    "v-contextmenu": "^3.0.0",
     "vue": "^3.2.37"
   },
   "devDependencies": {

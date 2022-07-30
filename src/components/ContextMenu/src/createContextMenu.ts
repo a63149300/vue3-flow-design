@@ -51,11 +51,8 @@ export const createContextMenu = function (options: CreateContextOptions) {
           dom && body.removeChild(dom);
         } catch (error) {}
       });
-
-      const contextMenuDom = container.querySelector('.context-menu');
-      if (contextMenuDom) {
-        contextMenuDom.removeEventListener('mouseleave', handleClick);
-      }
+      body.removeEventListener('click', handleClick);
+      body.removeEventListener('scroll', handleClick);
     };
 
     menuManager.resolve = function (arg) {
@@ -64,11 +61,8 @@ export const createContextMenu = function (options: CreateContextOptions) {
     };
     remove();
     body.appendChild(container);
-
-    setTimeout(() => {
-      const contextMenuDom = container.querySelector('.context-menu');
-      contextMenuDom && contextMenuDom.addEventListener('mouseleave', handleClick);
-    });
+    body.addEventListener('click', handleClick);
+    body.addEventListener('scroll', handleClick);
   });
 };
 

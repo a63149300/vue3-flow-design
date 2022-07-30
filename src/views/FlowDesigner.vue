@@ -138,7 +138,7 @@
 
 <script lang="ts" setup>
   import { jsPlumb, Defaults } from 'jsplumb';
-  import { reactive, ref, onMounted } from 'vue';
+  import { reactive, ref, onMounted, nextTick } from 'vue';
   import { message } from 'ant-design-vue';
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
@@ -147,9 +147,12 @@
   import { flowConfig } from '/@/config/args-config';
   import { IDragInfo } from './type';
   import { ToolsTypeEnum } from '/@/config/enums';
-  import { utils } from '/@/utils/common';
+  import { utils, getBrowserType } from '/@/utils/common';
+  import { useContextMenu } from '/@/hooks/useContextMenu';
 
-  const browserType = 3;
+  const [createContextMenu] = useContextMenu();
+
+  let browserType = 3;
   const plumb = ref<any>({});
   const field = reactive({
     tools: tools,
@@ -180,7 +183,6 @@
   const currentSelect = ref({});
   const currentSelectGroup = ref([]);
   let activeShortcut = true; // 画布聚焦开启快捷键
-  const linkContextMenuData = flowConfig.contextMenu.link;
   const flowPicture = {
     url: '',
     modalVisible: false,
@@ -192,6 +194,119 @@
     type: '',
     belongTo: '',
   });
+
+  // 浏览器兼容性
+  function dealCompatibility() {
+    browserType = getBrowserType();
+    if (browserType === 2) {
+      flowConfig.shortcut.scaleContainer = {
+        code: 16,
+        codeName: 'SHIFT(chrome下为ALT)',
+        shortcutName: '画布缩放',
+      };
+    }
+  }
+
+  // 初始化流程图
+  function initFlow() {
+    if (flowData.status === flowConfig.flowStatus.CREATE) {
+      flowData.attr.id = 'flow-' + utils.getId();
+    } else {
+      loadFlow();
+    }
+  }
+
+  // 渲染流程
+  async function loadFlow(json) {
+    clear();
+    await nextTick();
+    let loadData = JSON.parse(json);
+    flowData.attr = loadData.attr;
+    flowData.config = loadData.config;
+    flowData.status = flowConfig.flowStatus.LOADING;
+    plumb.value.batch(async () => {
+      let nodeList = loadData.nodeList;
+      nodeList.forEach((node) => {
+        flowData.nodeList.push(node);
+      });
+      let linkList = loadData.linkList;
+      await nextTick();
+      linkList.forEach((link) => {
+        flowData.linkList.push(link);
+        let conn = plumb.value.connect({
+          source: link.sourceId,
+          target: link.targetId,
+          anchor: flowConfig.jsPlumbConfig.anchor.default,
+          connector: [
+            link.cls.linkType,
+            {
+              gap: 5,
+              cornerRadius: 8,
+              alwaysRespectStubs: true,
+            },
+          ],
+          paintStyle: {
+            stroke: link.cls.linkColor,
+            strokeWidth: link.cls.linkThickness,
+          },
+        });
+        let link_id = conn.canvas.id;
+        let labelHandle = (e) => {
+          let event = window.event || e;
+          event.stopPropagation();
+          currentSelect.value = flowData.linkList.filter((l) => l.id === link_id)[0];
+        };
+
+        if (link.label !== '') {
+          conn.setLabel({
+            label: link.label,
+            cssClass: `linkLabel ${link_id}`,
+          });
+
+          // 添加label点击事件
+          document.querySelector('.' + link_id)?.addEventListener('click', labelHandle);
+        } else {
+          if (document.querySelector('.' + link_id)) {
+            // 移除label点击事件
+            document.querySelector('.' + link_id)?.removeEventListener('click', labelHandle);
+          }
+        }
+      });
+      currentSelect.value = {};
+      currentSelectGroup.value = [];
+      flowData.status = flowConfig.flowStatus.MODIFY;
+    }, true);
+    let canvasSize = computeCanvasSize();
+    flowCanvas.value.container.pos = {
+      top: -canvasSize.minY + 100,
+      left: -canvasSize.minX + 100,
+    };
+  }
+
+  // 计算流程图宽高
+  function computeCanvasSize() {
+    let nodeList = Object.assign([], flowData.nodeList),
+      minX = nodeList[0].x,
+      minY = nodeList[0].y,
+      maxX = nodeList[0].x + nodeList[0].width,
+      maxY = nodeList[0].y + nodeList[0].height;
+    nodeList.forEach((node) => {
+      minX = Math.min(minX, node.x);
+      minY = Math.min(minY, node.y);
+      maxX = Math.max(maxX, node.x + node.width);
+      maxY = Math.max(maxY, node.y + node.height);
+    });
+    let canvasWidth = maxX - minX;
+    let canvasHeight = maxY - minY;
+    return {
+      width: canvasWidth,
+      height: canvasHeight,
+      minX: minX,
+      minY: minY,
+      maxX: maxX,
+      maxY: maxY,
+    };
+  }
 
   // 实例化JsPlumb
   function initJsPlumb() {
@@ -259,16 +374,19 @@
   }
 
   // 连接线右键
-  function showLinkContextMenu(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    let flowMenu = document.querySelector('.vue-contextmenuName-flow-menu') as HTMLElement;
-    flowMenu.style.display = 'none';
-    let nodeMenu = document.querySelector('.vue-contextmenuName-node-menu') as HTMLElement;
-    nodeMenu.style.display = 'none';
-    let x = event.clientX;
-    let y = event.clientY;
-    linkContextMenuData.axis = { x, y };
+  function showLinkContextMenu(e: MouseEvent) {
+    e.stopPropagation();
+    createContextMenu({
+      event: e,
+      items: [
+        {
+          handler: () => {
+            deleteLink();
+          },
+          label: '删除连线',
+        },
+      ],
+    });
   }
 
   // 设置工具
@@ -353,6 +471,35 @@
   function setDragInfo(info: IDragInfo) {
     dragInfo.type = info.type;
     dragInfo.belongTo = info.belongTo;
+  }
+
+  // 关闭提示
+  function listenPage() {
+    window.onbeforeunload = function (e) {
+      e = e || window.event;
+      if (e) {
+        e.returnValue = '关闭提示';
+      }
+      return '关闭提示';
+    };
+  }
+
+  // 删除线
+  function deleteLink() {
+    let sourceId = currentSelect.value.sourceId;
+    let targetId = currentSelect.value.targetId;
+    plumb.value.deleteConnection(
+      plumb.value.getConnections({
+        source: sourceId,
+        target: targetId,
+      })[0],
+    );
+    let linkList = flowData.linkList;
+    linkList.splice(
+      linkList.findIndex((link) => link.sourceId === sourceId && link.targetId === targetId),
+      1,
+    );
+    currentSelect.value = {};
   }
 
   // 键盘移动节点
@@ -506,9 +653,15 @@
   }
 
   onMounted(() => {
+    // 浏览器兼容性
+    dealCompatibility();
     // 实例化JsPlumb
     initJsPlumb();
     // 初始化快捷键
     listenShortcut();
+    // 初始化流程图
+    initFlow();
+    // 关闭提示
+    listenPage();
   });
 </script>

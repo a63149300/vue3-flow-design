@@ -213,7 +213,7 @@
     currentSelect.value.label = label;
     let conn = props.plumb.getConnections({
       source: unref(currentSelect).sourceId,
-      target: unref(currentSelect).value.targetId,
+      target: unref(currentSelect).targetId,
     })[0];
     let link_id = conn.canvas.id;
     let labelHandle = (e) => {

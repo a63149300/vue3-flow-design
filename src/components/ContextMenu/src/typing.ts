@@ -5,6 +5,7 @@ export interface Axis {
 
 export interface ContextMenuItem {
   label: string;
+  icon?: string;
   hidden?: boolean;
   disabled?: boolean;
   handler?: Fn;
@@ -13,6 +14,7 @@ export interface ContextMenuItem {
 }
 export interface CreateContextOptions {
   event: MouseEvent;
+  icon?: string;
   styles?: any;
   items?: ContextMenuItem[];
 }

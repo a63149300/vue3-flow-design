@@ -8,7 +8,6 @@ export const getBrowserType = function () {
   if (isOpera) {
     return 1;
   }
-
   if (userAgent.indexOf('Firefox') > -1) {
     return 2;
   }
@@ -26,6 +25,7 @@ export const getBrowserType = function () {
     message.error('Edge浏览器支持性较差，推荐使用Firefox或Chrome');
     return 6;
   }
+  return 0;
 };
 
 export const utils = {

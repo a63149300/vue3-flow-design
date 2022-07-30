@@ -165,10 +165,9 @@
     width: 0,
   });
 
-  const containerContextMenuData = flowConfig.contextMenu.container;
-  let nodeContextMenuData = flowConfig.contextMenu.node;
   // 当前聚焦的连接线ID
-  const tempLinkId = ref('');
+  let tempLinkId = '';
+
   // 剪切板内容
   let clipboard = [];
 
@@ -181,8 +180,32 @@
     };
   });
 
+  function allowDrop(e: Event) {
+    e.preventDefault();
+    mousemoveHandler(e);
+  }
+
+  function drop() {
+    let belongTo = props.dragInfo.belongTo;
+    let type = props.dragInfo.type;
+
+    // 复位拖拽工具
+    emits('selectTool', 'drag');
+
+    emits('findNodeConfig', belongTo, type, (node) => {
+      if (!node) {
+        message.error('未知的节点类型！');
+        return;
+      }
+      // 增加节点
+      addNewNode(node);
+    });
+  }
+
   // 画布鼠标移动
-  function mousemoveHandler(event) {
+  function mousemoveHandler(e) {
+    let event = window.event || e;
+
     if (event.target.id === 'flowContainer') {
       mouse.position = {
         x: event.offsetX,
@@ -236,11 +259,6 @@
     }
   }
 
-  function allowDrop(e: Event) {
-    e.preventDefault();
-    mousemoveHandler(e);
-  }
-
   // x, y取整计算
   function computeNodePos(x, y) {
     const pxx = flowConfig.defaultStyle.alignGridPX[0];
@@ -285,23 +303,6 @@
       newNode.width = 200;
     }
     props.flowData.nodeList.push(newNode);
-  }
-
-  function drop() {
-    let belongTo = props.dragInfo.belongTo;
-    let type = props.dragInfo.type;
-
-    // 复位拖拽工具
-    emits('selectTool', 'drag');
-
-    emits('findNodeConfig', belongTo, type, (node) => {
-      if (!node) {
-        message.error('未知的节点类型！');
-        return;
-      }
-      // 增加节点
-      addNewNode(node);
-    });
   }
 
   // 画布鼠标按下
@@ -396,34 +397,93 @@
   }
 
   // 画布右健
-  function showContainerContextMenu(e) {
-    let event = window.event || e;
-
-    event.preventDefault();
-    document.querySelector('.vue-contextmenuName-node-menu').style.display = 'none';
-    document.querySelector('.vue-contextmenuName-link-menu').style.display = 'none';
-    selectContainer();
-    let x = event.clientX;
-    let y = event.clientY;
-    containerContextMenuData.axis = { x, y };
-  }
-
-  // 节点右键
-  function showNodeContextMenu(e) {
+  function showContainerContextMenu(e: MouseEvent) {
     createContextMenu({
       event: e,
       items: [
         {
           handler: () => {
-            copyNode.bind(null);
-            console.log(1);
+            flowInfo();
+          },
+          label: '流程图信息',
+        },
+        {
+          handler: () => {
+            paste();
+          },
+          label: '粘贴',
+        },
+        {
+          handler: () => {
+            selectAll();
+          },
+          label: '全选',
+        },
+        {
+          handler: () => {
+            saveFlow();
+          },
+          label: '保存流程',
+        },
+        {
+          label: '对齐方式',
+          children: [
+            {
+              handler: () => {
+                verticaLeft();
+              },
+              label: '垂直左对齐',
+            },
+            {
+              handler: () => {
+                verticalCenter();
+              },
+              label: '垂直居中',
+            },
+            {
+              handler: () => {
+                verticalRight();
+              },
+              label: '垂直右对齐',
+            },
+            {
+              handler: () => {
+                levelUp();
+              },
+              label: '水平上对齐',
+            },
+            {
+              handler: () => {
+                levelCenter();
+              },
+              label: '水平居中',
+            },
+            {
+              handler: () => {
+                levelDown();
+              },
+              label: '水平下对齐',
+            },
+          ],
+        },
+      ],
+    });
+  }
+
+  // 节点右键
+  function showNodeContextMenu(e: MouseEvent) {
+    createContextMenu({
+      event: e,
+      items: [
+        {
+          handler: () => {
+            copyNode();
           },
           label: '复制节点',
         },
         {
           handler: () => {
-            deleteNode.bind(null);
-            console.log(2);
+            deleteNode();
           },
           label: '删除节点',
         },
@@ -640,10 +700,6 @@
     }
   }
 
-  function addRemark() {
-    message.info('添加备注(待完善)...');
-  }
-
   // 复制节点
   function copyNode() {
     clipboard = [];
@@ -716,8 +772,9 @@
   function updateNodePos() {
     let nodeList = props.flowData.nodeList;
     currentSelectGroup.value.forEach((node) => {
-      let l = parseInt(document.querySelector('#' + node.id).style.left);
-      let t = parseInt(document.querySelector('#' + node.id).style.top);
+      let dom = document.querySelector('#' + node.id) as HTMLElement;
+      let l = parseInt(dom?.style?.left);
+      let t = parseInt(dom?.style?.top);
       let f = nodeList.filter((n) => n.id === node.id)[0];
       f.x = l;
       f.y = t;
@@ -770,18 +827,23 @@
     }
   }
 
+  defineExpose({
+    container,
+    rectangleMultiple,
+  });
+
   watch(
     () => props.select,
     (val) => {
       currentSelect.value = val;
       // 清除连接线焦点
-      if (tempLinkId.value !== '') {
-        document.querySelector('#' + tempLinkId.value)?.classList.remove('link-active');
-        tempLinkId.value = '';
+      if (tempLinkId !== '') {
+        document.querySelector('#' + tempLinkId)?.classList.remove('link-active');
+        tempLinkId = '';
       }
       // 设置连接线焦点
       if (unref(currentSelect).type === 'link') {
-        tempLinkId.value = unref(currentSelect).id;
+        tempLinkId = unref(currentSelect).id;
         document.querySelector('#' + unref(currentSelect).id)?.classList.add('link-active');
       }
     },

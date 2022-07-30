@@ -76,11 +76,6 @@
     </div>
     <div class="mouse-position"> x: {{ mouse.position.x }}, y: {{ mouse.position.y }} </div>
   </div>
-  <contextmenu ref="customContextmenu">
-    <contextmenu-item>菜单1</contextmenu-item>
-    <contextmenu-item>菜单2</contextmenu-item>
-    <contextmenu-item>菜单3</contextmenu-item>
-  </contextmenu>
 </template>
 
 <script lang="ts" setup>
@@ -90,6 +85,7 @@
   import { flowConfig } from '/@/config/args-config';
   import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';
+  import { useContextMenu } from '/@/hooks/useContextMenu';
 
   const props = defineProps([
     'browserType',
@@ -110,7 +106,7 @@
     'update:selectGroup',
   ]);
 
-  const customContextmenu = ref(null);
+  const [createContextMenu] = useContextMenu();
 
   const currentSelect = ref(props.select);
 
@@ -414,14 +410,25 @@
 
   // 节点右键
   function showNodeContextMenu(e) {
-    let event = window.event || e;
-
-    event.preventDefault();
-    document.querySelector('.vue-contextmenuName-flow-menu').style.display = 'none';
-    document.querySelector('.vue-contextmenuName-link-menu').style.display = 'none';
-    let x = event.clientX;
-    let y = event.clientY;
-    nodeContextMenuData.axis = { x, y };
+    createContextMenu({
+      event: e,
+      items: [
+        {
+          handler: () => {
+            copyNode.bind(null);
+            console.log(1);
+          },
+          label: '复制节点',
+        },
+        {
+          handler: () => {
+            deleteNode.bind(null);
+            console.log(2);
+          },
+          label: '删除节点',
+        },
+      ],
+    });
   }
 
   // 流程图信息

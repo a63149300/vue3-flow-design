@@ -1,0 +1,80 @@
+import contextMenuVue from './ContextMenu.vue';
+import { CreateContextOptions, ContextMenuProps } from './typing';
+import { createVNode, render } from 'vue';
+
+const menuManager: {
+  domList: Element[];
+  resolve: Fn;
+} = {
+  domList: [],
+  resolve: () => {},
+};
+
+export const createContextMenu = function (options: CreateContextOptions) {
+  const { event } = options || {};
+
+  event && event?.preventDefault();
+
+  if (typeof window === 'undefined') {
+    return;
+  }
+  return new Promise((resolve) => {
+    const body = document.body;
+
+    const container = document.createElement('div');
+    const propsData: Partial<ContextMenuProps> = {};
+    if (options.styles) {
+      propsData.styles = options.styles;
+    }
+
+    if (options.items) {
+      propsData.items = options.items;
+    }
+
+    if (options.event) {
+      propsData.customEvent = event;
+      propsData.axis = { x: event.clientX, y: event.clientY };
+    }
+
+    const vm = createVNode(contextMenuVue, propsData);
+    render(vm, container);
+
+    const handleClick = function () {
+      menuManager.resolve('');
+    };
+
+    menuManager.domList.push(container);
+
+    const remove = function () {
+      menuManager.domList.forEach((dom: Element) => {
+        try {
+          dom && body.removeChild(dom);
+        } catch (error) {}
+      });
+
+      const contextMenuDom = container.querySelector('.context-menu');
+      if (contextMenuDom) {
+        contextMenuDom.removeEventListener('mouseleave', handleClick);
+      }
+    };
+
+    menuManager.resolve = function (arg) {
+      remove();
+      resolve(arg);
+    };
+    remove();
+    body.appendChild(container);
+
+    setTimeout(() => {
+      const contextMenuDom = container.querySelector('.context-menu');
+      contextMenuDom && contextMenuDom.addEventListener('mouseleave', handleClick);
+    });
+  });
+};
+
+export const destroyContextMenu = function () {
+  if (menuManager) {
+    menuManager.resolve('');
+    menuManager.domList = [];
+  }
+};

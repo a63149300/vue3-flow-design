@@ -43,7 +43,7 @@
               </a-button>
             </a-tooltip>
             <a-tooltip title="生成流程图片" placement="bottom">
-              <a-button @click="null" class="header-option-button" size="small">
+              <a-button @click="exportFlowPicture" class="header-option-button" size="small">
                 <template #icon>
                   <PictureOutlined />
                 </template>
@@ -89,8 +89,8 @@
               okType="default"
               okText="快捷键大全"
               cancelText="使用文档"
-              @confirm="null"
-              @cancel="null"
+              @confirm="shortcutHelper"
+              @cancel="usingDoc"
             >
               <a-tooltip title="帮助" placement="bottom">
                 <a-button class="header-option-button" size="small">
@@ -101,7 +101,7 @@
               </a-tooltip>
             </a-popconfirm>
             <a-tooltip title="退出" placement="bottom">
-              <a-button @click="null" class="header-option-button" size="small">
+              <a-button @click="exit" class="header-option-button" size="small">
                 <template #icon>
                   <LogoutOutlined />
                 </template>
@@ -133,6 +133,23 @@
         <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
       </a-layout-sider>
     </a-layout>
+    <!-- 生成流程图片 -->
+    <a-modal
+      :title="'流程设计图_' + flowData.attr.id + '.png'"
+      centered
+      width="90%"
+      :closable="flowPicture.closable"
+      :maskClosable="flowPicture.maskClosable"
+      :visible="flowPicture.modalVisible"
+      okText="下载到本地"
+      cancelText="取消"
+      @ok="downLoadFlowPicture"
+      @cancel="cancelDownLoadFlowPicture"
+    >
+      <img :src="flowPicture.url" style="width: 100%" />
+    </a-modal>
+    <!-- 快捷键大全 -->
+    <shortcut-modal ref="shortcutModal" />
   </div>
 </template>
 
@@ -140,9 +157,12 @@
   import { jsPlumb, Defaults } from 'jsplumb';
   import { reactive, ref, onMounted, nextTick } from 'vue';
   import { message } from 'ant-design-vue';
+  import canvg from 'canvg';
+  import html2canvas from 'html2canvas';
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
+  import ShortcutModal from './modules/ShortcutModal.vue';
   import { tools, commonNodes, highNodes, laneNodes, IElement } from '/@/config/basic-node-config';
   import { flowConfig } from '/@/config/args-config';
   import { IDragInfo } from './type';
@@ -165,6 +185,10 @@
 
   const flowCanvas = ref<Nullable<HTMLElement>>(null);
 
+  const settingModal = ref<Nullable<HTMLElement>>(null);
+
+  const shortcutModal = ref<Nullable<HTMLElement>>(null);
+
   const flowData = reactive<Recordable>({
     nodeList: [],
     linkList: [],
@@ -177,18 +201,17 @@
       showGridIcon: 'EyeOutlined',
     },
     status: flowConfig.flowStatus.CREATE,
-    remarks: [],
   });
 
   const currentSelect = ref({});
   const currentSelectGroup = ref([]);
   let activeShortcut = true; // 画布聚焦开启快捷键
-  const flowPicture = {
+  const flowPicture = reactive({
     url: '',
     modalVisible: false,
     closable: false,
     maskClosable: false,
-  };
+  });
 
   const dragInfo = reactive<IDragInfo>({
     type: '',
@@ -452,9 +475,8 @@
 
     if (!checkFlow()) return;
     flowObj.status = flowConfig.flowStatus.SAVE;
-    let d = JSON.stringify(flowObj);
     message.success('保存流程成功！请查看控制台。');
-    return d;
+    console.log(flowObj);
   }
 
   // 设置快捷键失效
@@ -635,7 +657,6 @@
     currentSelectGroup.value = [];
     flowData.nodeList = [];
     flowData.linkList = [];
-    flowData.remarks = [];
   }
 
   // 显示隐藏网格
@@ -644,12 +665,98 @@
     if (flag) {
       flowData.config.showGrid = false;
       flowData.config.showGridText = '显示网格';
-      flowData.config.showGridIcon = 'eye-invisible';
+      flowData.config.showGridIcon = 'EyeInvisibleOutlined';
     } else {
       flowData.config.showGrid = true;
       flowData.config.showGridText = '隐藏网格';
-      flowData.config.showGridIcon = 'eye';
+      flowData.config.showGridIcon = 'EyeOutlined';
     }
+  }
+
+  // 退出流程设计器
+  function exit() {
+    message.info('退出');
+  }
+
+  // 设置
+  function setting() {
+    settingModal.value.open();
+  }
+
+  // 快捷键大全
+  function shortcutHelper() {
+    shortcutModal.value.open();
+  }
+
+  // 使用文档
+  function usingDoc() {
+    window.open('https://gitee.com/zhangyeping/vue-flow-design-plus');
+  }
+
+  // 生成流程图片
+  function exportFlowPicture() {
+    if (!checkFlow()) return;
+
+    let $Container = flowCanvas.value.$el.children[0],
+      svgElems = $Container.querySelectorAll('svg[id^="link-"]'),
+      removeArr = [];
+
+    console.log(flowCanvas.value);
+
+    svgElems.forEach((svgElem) => {
+      let linkCanvas = document.createElement('canvas');
+      let canvasId = 'linkCanvas-' + utils.getId();
+      linkCanvas.id = canvasId;
+      removeArr.push(canvasId);
+
+      let svgContent = svgElem.outerHTML.trim();
+      canvg(linkCanvas, svgContent);
+      if (svgElem.style.position) {
+        linkCanvas.style.position += svgElem.style.position;
+        linkCanvas.style.left += svgElem.style.left;
+        linkCanvas.style.top += svgElem.style.top;
+      }
+      $Container.appendChild(linkCanvas);
+    });
+
+    let canvasSize = computeCanvasSize();
+
+    let pbd = flowConfig.defaultStyle.photoBlankDistance;
+    let offsetPbd = utils.div(pbd, 2);
+
+    html2canvas($Container, {
+      width: canvasSize.width + pbd,
+      height: canvasSize.height + pbd,
+      scrollX: -canvasSize.minX + offsetPbd,
+      scrollY: -canvasSize.minY + offsetPbd,
+      logging: false,
+      onclone: () => {
+        removeArr.forEach((id) => {
+          let currentNode = document.querySelector('#' + id);
+          currentNode.parentNode.removeChild(currentNode);
+        });
+      },
+    }).then((canvas) => {
+      let dataURL = canvas.toDataURL('image/png');
+      flowPicture.url = dataURL;
+      flowPicture.modalVisible = true;
+    });
+  }
+
+  // 下载图片
+  function downLoadFlowPicture() {
+    let alink = document.createElement('a');
+    let alinkId = 'alink-' + utils.getId();
+    alink.id = alinkId;
+    alink.href = flowPicture.url;
+    alink.download = '流程设计图_' + flowData.attr.id + '.png';
+    alink.click();
+  }
+
+  // 取消下载
+  function cancelDownLoadFlowPicture() {
+    flowPicture.url = '';
+    flowPicture.modalVisible = false;
   }
 
   onMounted(() => {

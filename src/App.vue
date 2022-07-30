@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-  import FlowDesigner from '/@/components/FlowDesigner.vue';
+  import FlowDesigner from '/@/views/FlowDesigner.vue';
 </script>
 
 <style scoped></style>

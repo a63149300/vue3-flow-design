@@ -143,11 +143,11 @@
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
-  import { tools, commonNodes, highNodes, laneNodes, IElement } from './config/basic-node-config';
-  import { flowConfig } from './config/args-config';
+  import { tools, commonNodes, highNodes, laneNodes, IElement } from '/@/config/basic-node-config';
+  import { flowConfig } from '/@/config/args-config';
   import { IDragInfo } from './type';
-  import { ToolsTypeEnum } from './config/enums';
-  import { utils } from './utils/common';
+  import { ToolsTypeEnum } from '/@/config/enums';
+  import { utils } from '/@/utils/common';
 
   const browserType = 3;
   const plumb = ref<any>({});
@@ -477,7 +477,6 @@
         node = undefined;
     }
     callback(node);
-    console.log(flowData);
   }
 
   // 清除画布

@@ -241,7 +241,6 @@
   watch(
     () => props.select,
     (val) => {
-      console.log('FlowAttr:select', val);
       currentSelect.value = val;
       if (unref(currentSelect)?.type === 'link') {
         activeKey.value = 'link-attr';
@@ -257,7 +256,6 @@
   watch(
     () => currentSelect,
     (currentSelect) => {
-      console.log('FlowAttr:select', currentSelect);
       emits('update:select', currentSelect.value);
     },
     { deep: true },

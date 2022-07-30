@@ -99,9 +99,25 @@
 <script lang="ts" setup>
   import { ref, unref, watch, onMounted } from 'vue';
   import { Resizable } from 'resizable-dom';
-  import { flowConfig } from '../config/args-config';
+  import { flowConfig } from '/@/config/args-config';
 
-  const props = defineProps(['select', 'selectGroup', 'node', 'plumb', 'currentTool']);
+  const props = defineProps({
+    select: {
+      type: Object as any,
+    },
+    selectGroup: {
+      type: Object as any,
+    },
+    node: {
+      type: Object as any,
+    },
+    plumb: {
+      type: Object as any,
+    },
+    currentTool: {
+      type: Object as any,
+    },
+  });
 
   const emits = defineEmits([
     'update:select',
@@ -131,7 +147,7 @@
     }
   }
   // 设置鼠标样式
-  function setCursor(type) {
+  function setCursor(type: string) {
     switch (type) {
       case 'drag':
         return 'move';
@@ -144,7 +160,7 @@
 
   // 初始节点拖拽
   function registerNode() {
-    props.plumb.draggable(props.node.id, {
+    props?.plumb?.draggable(props.node.id, {
       containment: 'parent',
       handle: (e, el) => {
         // 判断节点类型
@@ -176,9 +192,9 @@
     });
 
     if (props.node.type === 'x-lane' || props.node.type === 'y-lane') {
-      let node = document.querySelector('#' + props.node.id);
+      let node = document.querySelector('#' + props.node.id) as HTMLElement;
       new Resizable(
-        props.node,
+        node,
         {
           handles: ['e', 'w', 'n', 's', 'nw', 'ne', 'sw', 'se'],
           initSize: {
@@ -189,8 +205,8 @@
           },
         },
         () => {
-          node.height = Math.ceil(parseInt(node.style.height));
-          node.width = Math.ceil(parseInt(node.style.width));
+          props.node.height = Math.ceil(parseInt(node.style.height));
+          props.node.width = Math.ceil(parseInt(node.style.width));
         },
       );
     }
@@ -227,7 +243,6 @@
   watch(
     () => props.select,
     (val) => {
-      console.log('FlowNode:select', val);
       currentSelect.value = val;
     },
     { deep: true },
@@ -236,7 +251,6 @@
   watch(
     () => currentSelect,
     (currentSelect) => {
-      console.log('FlowNode:currentSelect', currentSelect.value);
       emits('update:select', currentSelect.value);
     },
     { deep: true },

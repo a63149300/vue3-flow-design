@@ -76,14 +76,19 @@
     </div>
     <div class="mouse-position"> x: {{ mouse.position.x }}, y: {{ mouse.position.y }} </div>
   </div>
+  <contextmenu ref="customContextmenu">
+    <contextmenu-item>菜单1</contextmenu-item>
+    <contextmenu-item>菜单2</contextmenu-item>
+    <contextmenu-item>菜单3</contextmenu-item>
+  </contextmenu>
 </template>
 
 <script lang="ts" setup>
   import { reactive, ref, computed, watch, unref } from 'vue';
   import { message } from 'ant-design-vue';
   import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons-vue';
-  import { flowConfig } from '../config/args-config';
-  import { utils } from '../utils/common';
+  import { flowConfig } from '/@/config/args-config';
+  import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';
 
   const props = defineProps([
@@ -104,6 +109,8 @@
     'update:select',
     'update:selectGroup',
   ]);
+
+  const customContextmenu = ref(null);
 
   const currentSelect = ref(props.select);
 
@@ -759,7 +766,6 @@
   watch(
     () => props.select,
     (val) => {
-      console.log('FlowArea:select', val);
       currentSelect.value = val;
       // 清除连接线焦点
       if (tempLinkId.value !== '') {
@@ -778,7 +784,6 @@
   watch(
     () => currentSelect,
     (currentSelect) => {
-      console.log('FlowArea:currentSelect', currentSelect);
       emits('update:select', currentSelect.value);
     },
     { deep: true },

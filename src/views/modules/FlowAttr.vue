@@ -3,7 +3,7 @@
     <a-tab-pane key="flow-attr">
       <template #tab>
         <span>
-          <ClusterOutlined />
+          <component :is="'ClusterOutlined'" />
           流程属性
         </span>
       </template>
@@ -16,7 +16,7 @@
     <a-tab-pane key="node-attr">
       <template #tab>
         <span>
-          <ProfileOutlined />
+          <component :is="'ProfileOutlined'" />
           节点属性
         </span>
       </template>
@@ -160,7 +160,7 @@
     <a-tab-pane key="link-attr">
       <template #tab>
         <span>
-          <BranchesOutlined />
+          <component :is="'BranchesOutlined'" />
           连线属性
         </span>
       </template>
@@ -184,7 +184,6 @@
 
 <script lang="ts" setup>
   import { ref, watch, unref } from 'vue';
-  import { ClusterOutlined, ProfileOutlined, BranchesOutlined } from '@ant-design/icons-vue';
 
   const props = defineProps({
     plumb: {

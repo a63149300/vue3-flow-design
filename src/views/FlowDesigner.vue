@@ -38,14 +38,14 @@
             <a-tooltip title="保存流程" placement="bottom">
               <a-button @click="saveFlow" class="header-option-button" size="small">
                 <template #icon>
-                  <SaveOutlined />
+                  <component :is="'SaveOutlined'" />
                 </template>
               </a-button>
             </a-tooltip>
             <!-- <a-tooltip title="生成流程图片" placement="bottom">
               <a-button @click="exportFlowPicture" class="header-option-button" size="small">
                 <template #icon>
-                  <PictureOutlined />
+                  <component :is="'PictureOutlined'" />
                 </template>
               </a-button>
             </a-tooltip> -->
@@ -59,7 +59,7 @@
               <a-tooltip title="重新绘制" placement="bottom">
                 <a-button class="header-option-button" size="small">
                   <template #icon>
-                    <DeleteOutlined />
+                    <component :is="'DeleteOutlined'" />
                   </template>
                 </a-button>
               </a-tooltip>
@@ -72,14 +72,14 @@
             <!-- <a-tooltip title="设置" placement="bottom">
               <a-button @click="setting" class="header-option-button" size="small">
                 <template #icon>
-                  <SettingOutlined />
+                  <component :is="'SettingOutlined'" />
                 </template>
               </a-button>
             </a-tooltip> -->
             <a-tooltip title="测试" placement="bottom">
               <a-button @click="openTest" class="header-option-button" size="small">
                 <template #icon>
-                  <ToolOutlined />
+                  <component :is="'ToolOutlined'" />
                 </template>
               </a-button>
             </a-tooltip>
@@ -95,7 +95,7 @@
               <a-tooltip title="帮助" placement="bottom">
                 <a-button class="header-option-button" size="small">
                   <template #icon>
-                    <BookOutlined />
+                    <component :is="'BookOutlined'" />
                   </template>
                 </a-button>
               </a-tooltip>
@@ -103,7 +103,7 @@
             <a-tooltip title="退出" placement="bottom">
               <a-button @click="exit" class="header-option-button" size="small">
                 <template #icon>
-                  <LogoutOutlined />
+                  <component :is="'LogoutOutlined'" />
                 </template>
               </a-button>
             </a-tooltip>
@@ -166,7 +166,7 @@
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
-  import SettingModal from './modules/SettingModal.vue';
+  // import SettingModal from './modules/SettingModal.vue';
   import ShortcutModal from './modules/ShortcutModal.vue';
   import TestModal from './modules/TestModal.vue';
   import { tools, commonNodes, highNodes, laneNodes, IElement } from '/@/config/basic-node-config';
@@ -191,7 +191,7 @@
 
   const flowCanvas = ref<Nullable<HTMLElement>>(null);
 
-  const settingModal = ref<Nullable<HTMLElement>>(null);
+  // const settingModal = ref<Nullable<HTMLElement>>(null);
 
   const shortcutModal = ref<Nullable<HTMLElement>>(null);
 

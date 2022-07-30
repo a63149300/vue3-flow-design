@@ -64,13 +64,13 @@
     <div class="container-scale">
       <a-button size="small" type="default" @click="enlargeContainer">
         <template #icon>
-          <zoom-in-outlined />
+          <component :is="'ZoomInOutlined'" />
         </template>
       </a-button>
       <span>{{ container.scaleShow }}% </span>
       <a-button size="small" type="default" @click="narrowContainer">
         <template #icon>
-          <zoom-out-outlined />
+          <component :is="'ZoomOutOutlined'" />
         </template>
       </a-button>
     </div>
@@ -81,7 +81,6 @@
 <script lang="ts" setup>
   import { reactive, ref, computed, watch, unref } from 'vue';
   import { message } from 'ant-design-vue';
-  import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons-vue';
   import { flowConfig } from '/@/config/args-config';
   import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';

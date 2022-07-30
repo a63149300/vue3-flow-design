@@ -42,13 +42,13 @@
                 </template>
               </a-button>
             </a-tooltip>
-            <a-tooltip title="生成流程图片" placement="bottom">
+            <!-- <a-tooltip title="生成流程图片" placement="bottom">
               <a-button @click="exportFlowPicture" class="header-option-button" size="small">
                 <template #icon>
                   <PictureOutlined />
                 </template>
               </a-button>
-            </a-tooltip>
+            </a-tooltip> -->
             <a-popconfirm
               title="确认要重新绘制吗？"
               placement="bottom"
@@ -69,15 +69,15 @@
                 <component :is="flowData.config.showGridIcon" />
               </a-button>
             </a-tooltip>
-            <a-tooltip title="设置" placement="bottom">
-              <a-button @click="null" class="header-option-button" size="small">
+            <!-- <a-tooltip title="设置" placement="bottom">
+              <a-button @click="setting" class="header-option-button" size="small">
                 <template #icon>
                   <SettingOutlined />
                 </template>
               </a-button>
-            </a-tooltip>
+            </a-tooltip> -->
             <a-tooltip title="测试" placement="bottom">
-              <a-button @click="null" class="header-option-button" size="small">
+              <a-button @click="openTest" class="header-option-button" size="small">
                 <template #icon>
                   <ToolOutlined />
                 </template>
@@ -134,7 +134,7 @@
       </a-layout-sider>
     </a-layout>
     <!-- 生成流程图片 -->
-    <a-modal
+    <!-- <a-modal
       :title="'流程设计图_' + flowData.attr.id + '.png'"
       centered
       width="90%"
@@ -147,9 +147,13 @@
       @cancel="cancelDownLoadFlowPicture"
     >
       <img :src="flowPicture.url" style="width: 100%" />
-    </a-modal>
+    </a-modal> -->
+    <!-- 设置 -->
+    <!-- <setting-modal ref="settingModal" /> -->
     <!-- 快捷键大全 -->
     <shortcut-modal ref="shortcutModal" />
+    <!-- 测试 -->
+    <test-modal ref="testModal" @loadFlow="loadFlow" />
   </div>
 </template>
 
@@ -162,7 +166,9 @@
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
+  import SettingModal from './modules/SettingModal.vue';
   import ShortcutModal from './modules/ShortcutModal.vue';
+  import TestModal from './modules/TestModal.vue';
   import { tools, commonNodes, highNodes, laneNodes, IElement } from '/@/config/basic-node-config';
   import { flowConfig } from '/@/config/args-config';
   import { IDragInfo } from './type';
@@ -188,6 +194,8 @@
   const settingModal = ref<Nullable<HTMLElement>>(null);
 
   const shortcutModal = ref<Nullable<HTMLElement>>(null);
+
+  const testModal = ref<Nullable<HTMLElement>>(null);
 
   const flowData = reactive<Recordable>({
     nodeList: [],
@@ -678,10 +686,17 @@
     message.info('退出');
   }
 
-  // 设置
-  function setting() {
-    settingModal.value.open();
+  // 测试
+  function openTest() {
+    let flowObj = Object.assign({}, flowData);
+    testModal.value.flowData = flowObj;
+    testModal.value.testVisible = true;
   }
+
+  // 设置
+  // function setting() {
+  //   settingModal.value.open();
+  // }
 
   // 快捷键大全
   function shortcutHelper() {

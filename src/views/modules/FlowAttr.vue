@@ -1,5 +1,5 @@
 <template>
-  <a-tabs size="small" defaultActiveKey="flow-attr" v-model:activeKey="activeKey">
+  <a-tabs size="small" defaultActiveKey="flow-attr" :activeKey="activeKey">
     <a-tab-pane key="flow-attr">
       <template #tab>
         <span>

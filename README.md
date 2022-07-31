@@ -7,6 +7,10 @@
 - VUE3 FLOW DESIGN 流程设计器，基于 Vue3 + TypeScript + Vite + Ant Design Vue 3 + JSPlumb，你也可以选择 VUE2 版本[Vue-flow-design-plus](https://gitee.com/zhangyeping/vue-flow-design-plus)。
 - Vue3 版本以全新的技术栈重构了代码，并在原版基础上实现了更好的操作方式，新版会作为优先版本持续迭代。
 
+#### 环境版本
+
+- 新的技术栈需要较高的 node 版本，我用的 node: v16.15.1, npm: 8.11.0
+
 #### 技术栈
 
 - VUE3

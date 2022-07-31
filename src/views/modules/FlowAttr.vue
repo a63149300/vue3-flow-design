@@ -20,7 +20,7 @@
           节点属性
         </span>
       </template>
-      <template v-if="currentSelect.type === 'start'">
+      <template v-if="currentSelect.type === CommonNodeType.START">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -31,13 +31,13 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
         </a-form>
       </template>
-      <template v-if="currentSelect.type === 'end'">
+      <template v-if="currentSelect.type === CommonNodeType.END">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -48,13 +48,13 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
         </a-form>
       </template>
-      <template v-if="currentSelect.type === 'common'">
+      <template v-if="currentSelect.type === CommonNodeType.COMMON">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -65,13 +65,13 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === 'freedom'">
+      <template v-else-if="currentSelect.type === CommonNodeType.FREEDOM">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -82,13 +82,13 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === 'event'">
+      <template v-else-if="currentSelect.type === CommonNodeType.EVENT">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -99,13 +99,13 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === 'gateway'">
+      <template v-else-if="currentSelect.type === CommonNodeType.GATEWAY">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -116,13 +116,13 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === 'child-flow'">
+      <template v-else-if="currentSelect.type === HighNodeType.CHILD_FLOW">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -133,13 +133,17 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === 'x-lane' || currentSelect.type === 'y-lane'">
+      <template
+        v-else-if="
+          currentSelect.type === LaneNodesType.X_LANE || currentSelect.type === LaneNodesType.Y_LANE
+        "
+      >
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -150,7 +154,7 @@
           <a-form-item label="名称">
             <a-input
               placeholder="请输入节点名称"
-              :value="currentSelect.nodeName"
+              :value="(currentSelect as INode)?.nodeName"
               @change="nodeNameChange"
             />
           </a-form-item>
@@ -169,13 +173,13 @@
           <a-input :value="currentSelect.id" disabled />
         </a-form-item>
         <a-form-item label="源节点">
-          <a-input :value="currentSelect.sourceId" disabled />
+          <a-input :value="(currentSelect as ILink)?.sourceId" disabled />
         </a-form-item>
         <a-form-item label="目标节点">
-          <a-input :value="currentSelect.targetId" disabled />
+          <a-input :value="(currentSelect as ILink)?.targetId" disabled />
         </a-form-item>
         <a-form-item label="文本">
-          <a-input :value="currentSelect.label" @change="linkLabelChange" />
+          <a-input :value="(currentSelect as ILink)?.label" @change="linkLabelChange" />
         </a-form-item>
       </a-form>
     </a-tab-pane>
@@ -183,36 +187,41 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, watch, unref } from 'vue';
+  import { ref, watch, unref, PropType } from 'vue';
+  import { CommonNodeType, HighNodeType, LaneNodesType } from '/@/type/enums';
+  import { INode, ILink } from '/@/type/index';
 
   const props = defineProps({
     plumb: {
       type: Object,
+      default: () => ({}),
     },
     flowData: {
       type: Object,
+      default: () => ({}),
     },
     select: {
-      type: Object,
+      type: Object as PropType<INode | ILink>,
+      default: () => ({}),
     },
   });
 
   const emits = defineEmits(['update:select']);
 
-  const currentSelect = ref(props.select);
+  const currentSelect = ref<INode | ILink>(props.select);
 
   const activeKey = ref<string>('flow-attr');
 
   function nodeNameChange(e) {
-    currentSelect.value.nodeName = e.target.value;
+    (currentSelect.value as INode).nodeName = e.target.value;
   }
 
   function linkLabelChange(e) {
     let label = e.target.value;
-    currentSelect.value.label = label;
+    (currentSelect.value as ILink).label = label;
     let conn = props.plumb.getConnections({
-      source: unref(currentSelect).sourceId,
-      target: unref(currentSelect).targetId,
+      source: (unref(currentSelect) as ILink).sourceId,
+      target: (unref(currentSelect) as ILink).targetId,
     })[0];
     let link_id = conn.canvas.id;
     let labelHandle = (e) => {

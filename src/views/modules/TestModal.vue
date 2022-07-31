@@ -57,5 +57,3 @@
     testVisible,
   });
 </script>
-
-<style></style>

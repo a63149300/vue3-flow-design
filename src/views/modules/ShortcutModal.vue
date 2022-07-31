@@ -16,6 +16,7 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
   import { flowConfig } from '/@/config/args-config';
+  import { IShortcut } from '/@/type/index';
 
   const modalVisible = ref<boolean>(false);
 
@@ -36,7 +37,7 @@
     },
   ]);
 
-  const dataSource = ref([]);
+  const dataSource = ref<IShortcut[]>([]);
 
   function open() {
     modalVisible.value = true;

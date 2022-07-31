@@ -54,10 +54,10 @@
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
       >
-        <colorPicker
+        <!-- <colorPicker
           v-model:value="flowConfig.jsPlumbInsConfig.PaintStyle.stroke"
           @change="setLinkColor"
-        />
+        /> -->
       </a-form-item>
       <a-form-item
         label="粗细"
@@ -113,11 +113,7 @@
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
       >
-        <a-slider
-          :min="1"
-          v-model:value="flowConfig.defaultStyle.movePx"
-          @afterChange="setMovePx"
-        />
+        <a-slider :min="1" v-model:value="flowConfig.defaultStyle.movePx" />
       </a-form-item>
     </a-form>
   </a-drawer>

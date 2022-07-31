@@ -35,13 +35,6 @@
           </div>
           <!-- 工具区 -->
           <div class="header-option__buttons">
-            <a-tooltip title="保存流程" placement="bottom">
-              <a-button @click="saveFlow" class="header-option-button" size="small">
-                <template #icon>
-                  <component :is="'SaveOutlined'" />
-                </template>
-              </a-button>
-            </a-tooltip>
             <!-- <a-tooltip title="生成流程图片" placement="bottom">
               <a-button @click="exportFlowPicture" class="header-option-button" size="small">
                 <template #icon>
@@ -100,10 +93,10 @@
                 </a-button>
               </a-tooltip>
             </a-popconfirm>
-            <a-tooltip title="退出" placement="bottom">
-              <a-button @click="exit" class="header-option-button" size="small">
+            <a-tooltip title="保存流程" placement="bottom">
+              <a-button @click="saveFlow" class="header-option-button" size="small">
                 <template #icon>
-                  <component :is="'LogoutOutlined'" />
+                  <component :is="'SaveOutlined'" />
                 </template>
               </a-button>
             </a-tooltip>
@@ -113,7 +106,6 @@
           <flow-area
             ref="flowAreaRef"
             :dragInfo="dragInfo"
-            :browserType="browserType"
             :flowData="flowData"
             v-model:select="currentSelect"
             v-model:selectGroup="currentSelectGroup"
@@ -159,7 +151,7 @@
 
 <script lang="ts" setup>
   import { jsPlumb, Defaults } from 'jsplumb';
-  import { reactive, ref, onMounted, nextTick } from 'vue';
+  import { reactive, ref, onMounted, nextTick, unref } from 'vue';
   import { message } from 'ant-design-vue';
   // import canvg from 'canvg';
   // import html2canvas from 'html2canvas';
@@ -171,14 +163,13 @@
   import TestModal from './modules/TestModal.vue';
   import { tools, commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
   import { flowConfig } from '/@/config/args-config';
-  import { IDragInfo, IElement } from '/@/type/index';
-  import { ToolsTypeEnum } from '/@/type/enums';
-  import { utils, getBrowserType } from '/@/utils/common';
+  import { IDragInfo, IElement, INode, ILink } from '/@/type/index';
+  import { ToolsTypeEnum, LaneNodesType } from '/@/type/enums';
+  import { utils } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
 
   const [createContextMenu] = useContextMenu();
 
-  let browserType = 3;
   const plumb = ref<any>({});
   const field = reactive({
     tools: tools,
@@ -212,9 +203,9 @@
     status: flowConfig.flowStatus.CREATE,
   });
   // 当前选择节点
-  const currentSelect = ref({});
+  const currentSelect = ref<INode | ILink>();
   // 当前选择组
-  const currentSelectGroup = ref([]);
+  const currentSelectGroup = ref<INode[]>([]);
   // 画布聚焦开启快捷键
   let activeShortcut = true;
 
@@ -229,18 +220,6 @@
     type: '',
     belongTo: '',
   });
-
-  // 浏览器兼容性
-  function dealCompatibility() {
-    browserType = getBrowserType();
-    if (browserType === 2) {
-      flowConfig.shortcut.scaleContainer = {
-        code: 16,
-        codeName: 'SHIFT(chrome下为ALT)',
-        shortcutName: '画布缩放',
-      };
-    }
-  }
 
   // 初始化流程图
   function initFlow() {
@@ -261,7 +240,7 @@
     flowData.status = flowConfig.flowStatus.LOADING;
     plumb.value.batch(async () => {
       let nodeList = loadData.nodeList;
-      nodeList.forEach((node) => {
+      nodeList.forEach((node: Recordable) => {
         flowData.nodeList.push(node);
       });
       let linkList = loadData.linkList;
@@ -289,7 +268,7 @@
         let labelHandle = (e) => {
           let event = window.event || e;
           event.stopPropagation();
-          currentSelect.value = flowData.linkList.filter((l) => l.id === link_id)[0];
+          currentSelect.value = flowData.linkList.filter((l: Recordable) => l.id === link_id)[0];
         };
 
         if (link.label !== '') {
@@ -307,7 +286,7 @@
           }
         }
       });
-      currentSelect.value = {};
+      currentSelect.value = undefined;
       currentSelectGroup.value = [];
       flowData.status = flowConfig.flowStatus.MODIFY;
     }, true);
@@ -389,12 +368,12 @@
         linkColor: flowConfig.jsPlumbInsConfig.PaintStyle.stroke,
         linkThickness: flowConfig.jsPlumbInsConfig.PaintStyle.strokeWidth,
       };
-      document.querySelector('#' + id)!.addEventListener('contextmenu', (e) => {
+      document.querySelector('#' + id)?.addEventListener('contextmenu', (e) => {
         showLinkContextMenu(e);
         currentSelect.value = flowData.linkList.find((l: Recordable) => l.id === id);
       });
 
-      document.querySelector('#' + id)!.addEventListener('click', (e) => {
+      document.querySelector('#' + id)?.addEventListener('click', (e) => {
         let event = window.event || e;
         event.stopPropagation();
         currentSelect.value = flowData.linkList.find((l: Recordable) => l.id === id);
@@ -409,7 +388,7 @@
   }
 
   // 连接线右键
-  function showLinkContextMenu(e: MouseEvent) {
+  function showLinkContextMenu(e) {
     e.stopPropagation();
     createContextMenu({
       event: e,
@@ -441,12 +420,12 @@
 
   // 切换为拖拽
   function changeToDrag() {
-    flowData.nodeList.forEach((node) => {
+    flowData.nodeList.forEach((node: Recordable) => {
       let f = plumb.value.toggleDraggable(node.id);
       if (!f) {
         plumb.value.toggleDraggable(node.id);
       }
-      if (node.type !== 'x-lane' && node.type !== 'y-lane') {
+      if (node.type !== LaneNodesType.X_LANE && node.type !== LaneNodesType.Y_LANE) {
         plumb.value.unmakeSource(node.id);
         plumb.value.unmakeTarget(node.id);
       }
@@ -455,18 +434,18 @@
 
   // 切换为连线
   function changeToConnection() {
-    flowData.nodeList.forEach((node) => {
+    flowData.nodeList.forEach((node: Recordable) => {
       let f = plumb.value.toggleDraggable(node.id);
       if (f) {
         plumb.value.toggleDraggable(node.id);
       }
-      if (node.type !== 'x-lane' && node.type !== 'y-lane') {
+      if (node.type !== LaneNodesType.X_LANE && node.type !== LaneNodesType.Y_LANE) {
         plumb.value.makeSource(node.id, flowConfig.jsPlumbConfig.makeSourceConfig);
         plumb.value.makeTarget(node.id, flowConfig.jsPlumbConfig.makeTargetConfig);
       }
     });
 
-    currentSelect.value = {};
+    currentSelect.value = undefined;
     currentSelectGroup.value = [];
   }
 
@@ -520,8 +499,8 @@
 
   // 删除线
   function deleteLink() {
-    let sourceId = currentSelect.value.sourceId;
-    let targetId = currentSelect.value.targetId;
+    let sourceId = (unref(currentSelect) as ILink)?.sourceId;
+    let targetId = (unref(currentSelect) as ILink)?.targetId;
     plumb.value.deleteConnection(
       plumb.value.getConnections({
         source: sourceId,
@@ -530,10 +509,12 @@
     );
     let linkList = flowData.linkList;
     linkList.splice(
-      linkList.findIndex((link) => link.sourceId === sourceId && link.targetId === targetId),
+      linkList.findIndex(
+        (link: Recordable) => link.sourceId === sourceId && link.targetId === targetId,
+      ),
       1,
     );
-    currentSelect.value = {};
+    currentSelect.value = undefined;
   }
 
   // 键盘移动节点
@@ -563,11 +544,11 @@
         }
       });
       plumb.value.repaintEverything();
-    } else if (currentSelect.value.id) {
+    } else if (unref(currentSelect)?.id) {
       if (isX) {
-        currentSelect.value.x += m;
+        (currentSelect.value as INode)!.x += m;
       } else {
-        currentSelect.value.y += m;
+        (currentSelect.value as INode)!.y += m;
       }
       plumb.value.repaintEverything();
     }
@@ -575,12 +556,10 @@
 
   // 初始化快捷键
   function listenShortcut() {
-    document.onkeydown = (e) => {
-      let event = window.event || e;
-
+    document.onkeydown = (e: KeyboardEvent) => {
       // 画布聚焦开启快捷键
       if (!activeShortcut) return;
-      let key = event.keyCode;
+      let key = e.code;
 
       switch (key) {
         case flowConfig.shortcut.multiple.code:
@@ -588,9 +567,6 @@
           break;
         case flowConfig.shortcut.dragContainer.code:
           flowAreaRef.value.container.dragFlag = true;
-          break;
-        case flowConfig.shortcut.scaleContainer.code:
-          flowAreaRef.value.container.scaleFlag = true;
           break;
         case flowConfig.shortcut.dragTool.code:
           selectTool('drag');
@@ -612,29 +588,22 @@
           break;
       }
 
-      if (event.ctrlKey) {
-        if (event.altKey) {
-          switch (key) {
-            case flowConfig.shortcut.settingModal.code:
-              setting();
-              break;
-            case flowConfig.shortcut.testModal.code:
-              openTest();
-              break;
-          }
+      if (e.ctrlKey) {
+        switch (key) {
+          case flowConfig.shortcut.settingModal.code:
+            // setting();
+            break;
+          case flowConfig.shortcut.testModal.code:
+            openTest();
+            break;
         }
       }
     };
     // 拖拽、缩放、多选快捷键复位
-    document.onkeyup = (e) => {
-      let event = window.event || e;
-
-      let key = event.keyCode;
+    document.onkeyup = (event: KeyboardEvent) => {
+      let key = event.code;
       if (key === flowConfig.shortcut.dragContainer.code) {
         flowAreaRef.value.container.dragFlag = false;
-      } else if (key === flowConfig.shortcut.scaleContainer.code) {
-        event.preventDefault();
-        flowAreaRef.value.container.scaleFlag = false;
       } else if (key === flowConfig.shortcut.multiple.code) {
         flowAreaRef.value.rectangleMultiple.flag = false;
       }
@@ -665,7 +634,7 @@
     flowData.nodeList.forEach((node) => {
       plumb.value.remove(node.id);
     });
-    currentSelect.value = {};
+    currentSelect.value = undefined;
     currentSelectGroup.value = [];
     flowData.nodeList = [];
     flowData.linkList = [];
@@ -683,11 +652,6 @@
       flowData.config.showGridText = '隐藏网格';
       flowData.config.showGridIcon = 'EyeOutlined';
     }
-  }
-
-  // 退出流程设计器
-  function exit() {
-    message.info('退出');
   }
 
   // 测试
@@ -779,8 +743,6 @@
   // }
 
   onMounted(() => {
-    // 浏览器兼容性
-    dealCompatibility();
     // 实例化JsPlumb
     initJsPlumb();
     // 初始化快捷键

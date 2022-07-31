@@ -1,12 +1,16 @@
 <template>
   <div
-    v-if="node.type === 'start' || node.type === 'end' || node.type === 'event'"
+    v-if="
+      node.type === CommonNodeType.START ||
+      node.type === CommonNodeType.END ||
+      node.type === CommonNodeType.EVENT
+    "
     :id="node.id"
     class="common-circle-node"
     :class="{
       active: isActive(),
-      isStart: node.type === 'start',
-      isEnd: node.type === 'end',
+      isStart: node.type === CommonNodeType.START,
+      isEnd: node.type === CommonNodeType.END,
     }"
     :style="{
       top: node.y + 'px',
@@ -20,7 +24,11 @@
   </div>
 
   <div
-    v-else-if="node.type === 'common' || node.type === 'freedom' || node.type === 'child-flow'"
+    v-else-if="
+      node.type === CommonNodeType.COMMON ||
+      node.type === CommonNodeType.FREEDOM ||
+      node.type === HighNodeType.CHILD_FLOW
+    "
     :id="node.id"
     class="common-rectangle-node"
     :class="{ active: isActive() }"
@@ -37,7 +45,7 @@
   </div>
 
   <div
-    v-else-if="node.type === 'gateway'"
+    v-else-if="node.type === CommonNodeType.GATEWAY"
     :id="node.id"
     class="common-diamond-node"
     :class="{ active: isActive() }"
@@ -52,9 +60,9 @@
   </div>
 
   <div
-    v-else-if="node.type === 'x-lane'"
+    v-else-if="node.type === LaneNodesType.X_LANE"
     :id="node.id"
-    class="common-x-lane-node"
+    class="common-x_lane-node"
     :class="{ active: isActive() }"
     :style="{
       top: node.y + 'px',
@@ -74,9 +82,9 @@
   </div>
 
   <div
-    v-else-if="node.type === 'y-lane'"
+    v-else-if="node.type === LaneNodesType.Y_LANE"
     :id="node.id"
-    class="common-y-lane-node"
+    class="common-y_lane-node"
     :class="{ active: isActive() }"
     :style="{
       top: node.y + 'px',
@@ -97,25 +105,32 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, unref, watch, onMounted } from 'vue';
+  import { ref, unref, watch, onMounted, PropType } from 'vue';
   import { Resizable } from 'resizable-dom';
   import { flowConfig } from '/@/config/args-config';
+  import { CommonNodeType, HighNodeType, LaneNodesType } from '/@/type/enums';
+  import { INode, ILink, IElement } from '/@/type/index';
 
   const props = defineProps({
     select: {
-      type: Object as any,
+      type: Object as PropType<INode | ILink>,
+      default: () => ({}),
     },
     selectGroup: {
-      type: Object as any,
+      type: Array as PropType<INode[]>,
+      default: () => [],
     },
     node: {
-      type: Object as any,
+      type: Object as PropType<INode>,
+      default: () => ({}),
     },
     plumb: {
-      type: Object as any,
+      type: Object,
+      default: () => ({}),
     },
     currentTool: {
-      type: Object as any,
+      type: Object as PropType<IElement>,
+      default: () => ({}),
     },
   });
 
@@ -136,11 +151,11 @@
   // 设置ICON
   function setIcon(type: string) {
     switch (type) {
-      case 'common':
+      case CommonNodeType.COMMON:
         return 'UserOutlined';
-      case 'freedom':
+      case CommonNodeType.FREEDOM:
         return 'SyncOutlined';
-      case 'child-flow':
+      case HighNodeType.CHILD_FLOW:
         return 'ApartmentOutlined';
       default:
         return 'ToolOutlined';
@@ -191,7 +206,7 @@
       },
     });
 
-    if (props.node.type === 'x-lane' || props.node.type === 'y-lane') {
+    if (props.node.type === LaneNodesType.X_LANE || props.node.type === LaneNodesType.Y_LANE) {
       let node = document.querySelector('#' + props.node.id) as HTMLElement;
       new Resizable(
         node,
@@ -235,6 +250,9 @@
   }
   // 节点是否激活
   function isActive() {
+    if (!unref(currentSelect)) {
+      return false;
+    }
     if (unref(currentSelect).id === props.node.id) return true;
     let f = unref(currentSelectGroup).find((n) => n.id === props.node.id);
     return !!f;

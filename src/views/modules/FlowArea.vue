@@ -79,22 +79,41 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, computed, watch, unref } from 'vue';
+  import { reactive, ref, computed, watch, unref, PropType } from 'vue';
   import { message } from 'ant-design-vue';
   import { flowConfig } from '/@/config/args-config';
   import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';
   import { useContextMenu } from '/@/hooks/useContextMenu';
+  import { CommonNodeType, LaneNodesType } from '/@/type/enums';
+  import { INode, ILink, IElement, IDragInfo } from '/@/type/index';
 
-  const props = defineProps([
-    'browserType',
-    'flowData',
-    'plumb',
-    'select',
-    'selectGroup',
-    'currentTool',
-    'dragInfo',
-  ]);
+  const props = defineProps({
+    flowData: {
+      type: Object,
+      default: () => ({}),
+    },
+    plumb: {
+      type: Object,
+      default: () => ({}),
+    },
+    select: {
+      type: Object as PropType<INode | ILink>,
+      default: () => ({}),
+    },
+    selectGroup: {
+      type: Array as PropType<INode[]>,
+      default: () => [],
+    },
+    currentTool: {
+      type: Object as PropType<IElement>,
+      default: () => ({}),
+    },
+    dragInfo: {
+      type: Object as PropType<IDragInfo>,
+      default: () => ({}),
+    },
+  });
 
   const emits = defineEmits([
     'findNodeConfig',
@@ -168,7 +187,7 @@
   let tempLinkId = '';
 
   // 剪切板内容
-  let clipboard = [];
+  let clipboard: INode[] = [];
 
   const gridStyle = computed(() => {
     return {
@@ -282,10 +301,10 @@
     newNode.id = newNode.type + '-' + utils.getId();
     newNode.height = 50;
     if (
-      newNode.type === 'start' ||
-      newNode.type === 'end' ||
-      newNode.type === 'event' ||
-      newNode.type === 'gateway'
+      newNode.type === CommonNodeType.START ||
+      newNode.type === CommonNodeType.END ||
+      newNode.type === CommonNodeType.EVENT ||
+      newNode.type === CommonNodeType.GATEWAY
     ) {
       newNode.x = x - 25;
       newNode.width = 50;
@@ -294,10 +313,10 @@
       newNode.width = 120;
     }
     newNode.y = y - 25;
-    if (newNode.type === 'x-lane') {
+    if (newNode.type === LaneNodesType.X_LANE) {
       newNode.height = 200;
       newNode.width = 500;
-    } else if (newNode.type === 'y-lane') {
+    } else if (newNode.type === LaneNodesType.Y_LANE) {
       newNode.height = 500;
       newNode.width = 200;
     }
@@ -355,18 +374,10 @@
     let event = window.event || e;
 
     if (container.scaleFlag) {
-      if (props.browserType === 2) {
-        if (event.detail < 0) {
-          enlargeContainer();
-        } else {
-          narrowContainer();
-        }
-      } else {
-        if (event.deltaY < 0) {
-          enlargeContainer();
-        } else if (container.scale) {
-          narrowContainer();
-        }
+      if (event.deltaY < 0) {
+        enlargeContainer();
+      } else if (container.scale) {
+        narrowContainer();
       }
     }
   }
@@ -502,7 +513,7 @@
   // 粘贴
   function paste() {
     let dis = 0;
-    clipboard.forEach((node) => {
+    clipboard.forEach((node: INode) => {
       let newNode = Object.assign({}, node);
       newNode.id = newNode.type + '-' + utils.getId();
       let nodePos = computeNodePos(mouse.position.x + dis, mouse.position.y + dis);
@@ -705,7 +716,7 @@
     if (currentSelectGroup.value.length > 0) {
       clipboard = Object.assign([], currentSelectGroup.value);
     } else if (currentSelect.value.id) {
-      clipboard.push(currentSelect.value);
+      clipboard.push(unref(currentSelect) as INode);
     }
   }
 
@@ -724,9 +735,9 @@
   function deleteNode() {
     let nodeList = props.flowData.nodeList;
     let linkList = props.flowData.linkList;
-    let arr = [];
+    let arr: INode[] = [];
 
-    arr.push(Object.assign({}, currentSelect.value));
+    arr.push(Object.assign({}, unref(currentSelect) as INode));
 
     props.flowData.status = flowConfig.flowStatus.LOADING;
 
@@ -759,7 +770,7 @@
   }
   // 清除面布已选内容
   function selectContainer() {
-    currentSelect.value = {};
+    currentSelect.value = {} as INode | ILink;
     // 开启快捷键
     emits('getShortcut');
   }

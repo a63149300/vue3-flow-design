@@ -111,7 +111,7 @@
         </a-layout-header>
         <a-layout-content class="content">
           <flow-area
-            ref="flowCanvas"
+            ref="flowAreaRef"
             :dragInfo="dragInfo"
             :browserType="browserType"
             :flowData="flowData"
@@ -149,11 +149,11 @@
       <img :src="flowPicture.url" style="width: 100%" />
     </a-modal> -->
     <!-- 设置 -->
-    <!-- <setting-modal ref="settingModal" /> -->
+    <!-- <setting-modal ref="settingModalRef" /> -->
     <!-- 快捷键大全 -->
-    <shortcut-modal ref="shortcutModal" />
+    <ShortcutModal ref="shortcutModalRef" />
     <!-- 测试 -->
-    <test-modal ref="testModal" @loadFlow="loadFlow" />
+    <TestModal ref="testModalRef" @loadFlow="loadFlow" />
   </div>
 </template>
 
@@ -161,18 +161,18 @@
   import { jsPlumb, Defaults } from 'jsplumb';
   import { reactive, ref, onMounted, nextTick } from 'vue';
   import { message } from 'ant-design-vue';
-  import canvg from 'canvg';
-  import html2canvas from 'html2canvas';
+  // import canvg from 'canvg';
+  // import html2canvas from 'html2canvas';
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
   // import SettingModal from './modules/SettingModal.vue';
   import ShortcutModal from './modules/ShortcutModal.vue';
   import TestModal from './modules/TestModal.vue';
-  import { tools, commonNodes, highNodes, laneNodes, IElement } from '/@/config/basic-node-config';
+  import { tools, commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
   import { flowConfig } from '/@/config/args-config';
-  import { IDragInfo } from './type';
-  import { ToolsTypeEnum } from '/@/config/enums';
+  import { IDragInfo, IElement } from '/@/type/index';
+  import { ToolsTypeEnum } from '/@/type/enums';
   import { utils, getBrowserType } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
 
@@ -189,13 +189,14 @@
 
   const currentTool = ref<IElement>(tools[0]);
 
-  const flowCanvas = ref<Nullable<HTMLElement>>(null);
+  const flowAreaRef = ref();
 
-  // const settingModal = ref<Nullable<HTMLElement>>(null);
+  // const settingModalRef = ref();
 
-  const shortcutModal = ref<Nullable<HTMLElement>>(null);
+  const shortcutModalRef = ref();
 
-  const testModal = ref<Nullable<HTMLElement>>(null);
+  // 测试Ref
+  const testModalRef = ref();
 
   const flowData = reactive<Recordable>({
     nodeList: [],
@@ -210,16 +211,19 @@
     },
     status: flowConfig.flowStatus.CREATE,
   });
-
+  // 当前选择节点
   const currentSelect = ref({});
+  // 当前选择组
   const currentSelectGroup = ref([]);
-  let activeShortcut = true; // 画布聚焦开启快捷键
-  const flowPicture = reactive({
-    url: '',
-    modalVisible: false,
-    closable: false,
-    maskClosable: false,
-  });
+  // 画布聚焦开启快捷键
+  let activeShortcut = true;
+
+  // const flowPicture = reactive({
+  //   url: '',
+  //   modalVisible: false,
+  //   closable: false,
+  //   maskClosable: false,
+  // });
 
   const dragInfo = reactive<IDragInfo>({
     type: '',
@@ -248,10 +252,10 @@
   }
 
   // 渲染流程
-  async function loadFlow(json) {
+  async function loadFlow(str = '') {
     clear();
     await nextTick();
-    let loadData = JSON.parse(json);
+    let loadData = JSON.parse(str);
     flowData.attr = loadData.attr;
     flowData.config = loadData.config;
     flowData.status = flowConfig.flowStatus.LOADING;
@@ -308,7 +312,7 @@
       flowData.status = flowConfig.flowStatus.MODIFY;
     }, true);
     let canvasSize = computeCanvasSize();
-    flowCanvas.value.container.pos = {
+    flowAreaRef.value.container.pos = {
       top: -canvasSize.minY + 100,
       left: -canvasSize.minX + 100,
     };
@@ -580,13 +584,13 @@
 
       switch (key) {
         case flowConfig.shortcut.multiple.code:
-          flowCanvas.value.rectangleMultiple.flag = true;
+          flowAreaRef.value.rectangleMultiple.flag = true;
           break;
         case flowConfig.shortcut.dragContainer.code:
-          flowCanvas.value.container.dragFlag = true;
+          flowAreaRef.value.container.dragFlag = true;
           break;
         case flowConfig.shortcut.scaleContainer.code:
-          flowCanvas.value.container.scaleFlag = true;
+          flowAreaRef.value.container.scaleFlag = true;
           break;
         case flowConfig.shortcut.dragTool.code:
           selectTool('drag');
@@ -627,12 +631,12 @@
 
       let key = event.keyCode;
       if (key === flowConfig.shortcut.dragContainer.code) {
-        flowCanvas.value.container.dragFlag = false;
+        flowAreaRef.value.container.dragFlag = false;
       } else if (key === flowConfig.shortcut.scaleContainer.code) {
         event.preventDefault();
-        flowCanvas.value.container.scaleFlag = false;
+        flowAreaRef.value.container.scaleFlag = false;
       } else if (key === flowConfig.shortcut.multiple.code) {
-        flowCanvas.value.rectangleMultiple.flag = false;
+        flowAreaRef.value.rectangleMultiple.flag = false;
       }
     };
   }
@@ -689,18 +693,18 @@
   // 测试
   function openTest() {
     let flowObj = Object.assign({}, flowData);
-    testModal.value.flowData = flowObj;
-    testModal.value.testVisible = true;
+    testModalRef.value.flowData = flowObj;
+    testModalRef.value.testVisible = true;
   }
 
   // 设置
   // function setting() {
-  //   settingModal.value.open();
+  //   settingModalRef.value.open();
   // }
 
   // 快捷键大全
   function shortcutHelper() {
-    shortcutModal.value.open();
+    shortcutModalRef.value.open();
   }
 
   // 使用文档
@@ -709,70 +713,70 @@
   }
 
   // 生成流程图片
-  function exportFlowPicture() {
-    if (!checkFlow()) return;
+  // function exportFlowPicture() {
+  //   if (!checkFlow()) return;
 
-    let $Container = flowCanvas.value.$el.children[0],
-      svgElems = $Container.querySelectorAll('svg[id^="link-"]'),
-      removeArr = [];
+  //   let $Container = flowAreaRef.value.$el.children[0],
+  //     svgElems = $Container.querySelectorAll('svg[id^="link-"]'),
+  //     removeArr = [];
 
-    console.log(flowCanvas.value);
+  //   console.log(flowAreaRef.value);
 
-    svgElems.forEach((svgElem) => {
-      let linkCanvas = document.createElement('canvas');
-      let canvasId = 'linkCanvas-' + utils.getId();
-      linkCanvas.id = canvasId;
-      removeArr.push(canvasId);
+  //   svgElems.forEach((svgElem) => {
+  //     let linkCanvas = document.createElement('canvas');
+  //     let canvasId = 'linkCanvas-' + utils.getId();
+  //     linkCanvas.id = canvasId;
+  //     removeArr.push(canvasId);
 
-      let svgContent = svgElem.outerHTML.trim();
-      canvg(linkCanvas, svgContent);
-      if (svgElem.style.position) {
-        linkCanvas.style.position += svgElem.style.position;
-        linkCanvas.style.left += svgElem.style.left;
-        linkCanvas.style.top += svgElem.style.top;
-      }
-      $Container.appendChild(linkCanvas);
-    });
+  //     let svgContent = svgElem.outerHTML.trim();
+  //     canvg(linkCanvas, svgContent);
+  //     if (svgElem.style.position) {
+  //       linkCanvas.style.position += svgElem.style.position;
+  //       linkCanvas.style.left += svgElem.style.left;
+  //       linkCanvas.style.top += svgElem.style.top;
+  //     }
+  //     $Container.appendChild(linkCanvas);
+  //   });
 
-    let canvasSize = computeCanvasSize();
+  //   let canvasSize = computeCanvasSize();
 
-    let pbd = flowConfig.defaultStyle.photoBlankDistance;
-    let offsetPbd = utils.div(pbd, 2);
+  //   let pbd = flowConfig.defaultStyle.photoBlankDistance;
+  //   let offsetPbd = utils.div(pbd, 2);
 
-    html2canvas($Container, {
-      width: canvasSize.width + pbd,
-      height: canvasSize.height + pbd,
-      scrollX: -canvasSize.minX + offsetPbd,
-      scrollY: -canvasSize.minY + offsetPbd,
-      logging: false,
-      onclone: () => {
-        removeArr.forEach((id) => {
-          let currentNode = document.querySelector('#' + id);
-          currentNode.parentNode.removeChild(currentNode);
-        });
-      },
-    }).then((canvas) => {
-      let dataURL = canvas.toDataURL('image/png');
-      flowPicture.url = dataURL;
-      flowPicture.modalVisible = true;
-    });
-  }
+  //   html2canvas($Container, {
+  //     width: canvasSize.width + pbd,
+  //     height: canvasSize.height + pbd,
+  //     scrollX: -canvasSize.minX + offsetPbd,
+  //     scrollY: -canvasSize.minY + offsetPbd,
+  //     logging: false,
+  //     onclone: () => {
+  //       removeArr.forEach((id) => {
+  //         let currentNode = document.querySelector('#' + id);
+  //         currentNode.parentNode.removeChild(currentNode);
+  //       });
+  //     },
+  //   }).then((canvas) => {
+  //     let dataURL = canvas.toDataURL('image/png');
+  //     flowPicture.url = dataURL;
+  //     flowPicture.modalVisible = true;
+  //   });
+  // }
 
   // 下载图片
-  function downLoadFlowPicture() {
-    let alink = document.createElement('a');
-    let alinkId = 'alink-' + utils.getId();
-    alink.id = alinkId;
-    alink.href = flowPicture.url;
-    alink.download = '流程设计图_' + flowData.attr.id + '.png';
-    alink.click();
-  }
+  // function downLoadFlowPicture() {
+  //   let alink = document.createElement('a');
+  //   let alinkId = 'alink-' + utils.getId();
+  //   alink.id = alinkId;
+  //   alink.href = flowPicture.url;
+  //   alink.download = '流程设计图_' + flowData.attr.id + '.png';
+  //   alink.click();
+  // }
 
   // 取消下载
-  function cancelDownLoadFlowPicture() {
-    flowPicture.url = '';
-    flowPicture.modalVisible = false;
-  }
+  // function cancelDownLoadFlowPicture() {
+  //   flowPicture.url = '';
+  //   flowPicture.modalVisible = false;
+  // }
 
   onMounted(() => {
     // 浏览器兼容性

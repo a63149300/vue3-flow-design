@@ -11,7 +11,7 @@
 </template>
 <script lang="ts" setup>
   import { PropType } from 'vue';
-  import { IElement } from '/@/config/basic-node-config';
+  import { IElement } from '/@/type/index';
 
   defineProps({
     nodeList: {

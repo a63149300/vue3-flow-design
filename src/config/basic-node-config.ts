@@ -1,9 +1,5 @@
-import { ToolsTypeEnum } from './enums';
-export interface IElement {
-  type: string;
-  nodeName: string;
-  icon: string;
-}
+import { ToolsTypeEnum } from '/@/type/enums';
+import { IElement } from '/@/type/index';
 
 export const tools: IElement[] = [
   {

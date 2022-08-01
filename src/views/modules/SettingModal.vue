@@ -1,13 +1,13 @@
 <template>
   <a-drawer
     title="设置"
+    :zIndex="1001"
     placement="right"
-    :zIndex="10001"
     :width="600"
     :visible="settingVisible"
     @close="close"
   >
-    <a-form :form="settingForm" layout="horizontal">
+    <a-form layout="horizontal">
       <a-divider orientation="left">画布</a-divider>
       <a-form-item
         label="缩小比例"
@@ -49,16 +49,16 @@
           <a-select-option value="StateMachine">状态线</a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item
+      <!-- <a-form-item
         label="颜色"
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
       >
-        <!-- <colorPicker
+        <colorPicker
           v-model:value="flowConfig.jsPlumbInsConfig.PaintStyle.stroke"
           @change="setLinkColor"
-        /> -->
-      </a-form-item>
+        />
+      </a-form-item> -->
       <a-form-item
         label="粗细"
         :label-col="formItemLayout.labelCol"
@@ -81,7 +81,7 @@
         <a-switch
           checkedChildren="开"
           unCheckedChildren="关"
-          v-model:value="flowConfig.defaultStyle.isOpenAuxiliaryLine"
+          v-model:checked="flowConfig.defaultStyle.isOpenAuxiliaryLine"
         />
       </a-form-item>
       <a-form-item
@@ -120,16 +120,27 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
-  import { flowConfig } from '/@/config/args-config';
+  import { reactive, ref, watch } from 'vue';
+
+  const props = defineProps({
+    config: {
+      type: Object,
+      default: () => ({}),
+    },
+  });
+
+  const emits = defineEmits(['update:config']);
+
+  const flowConfig = reactive(props.config);
 
   const settingVisible = ref<boolean>(false);
+
   const formItemLayout = reactive({
     labelCol: { span: 6 },
     wrapperCol: { span: 15 },
   });
+
   let initFlag = false;
-  const settingForm = ref(null);
 
   async function init() {}
 
@@ -140,31 +151,25 @@
       initFlag = true;
     }
   }
+
   function close() {
     settingVisible.value = false;
   }
 
-  function formatterContainerOnceNarrow(v) {
+  function formatterContainerOnceNarrow(v: number) {
     return `${v * 100}%`;
   }
 
-  function formatterContainerOnceEnlarge(v) {
+  function formatterContainerOnceEnlarge(v: number) {
     return `${v * 100}%`;
   }
+
+  watch(
+    () => flowConfig,
+    (val) => {
+      emits('update:config', val);
+    },
+  );
 
   defineExpose({ open });
 </script>
-
-<style>
-  .m-colorPicker .box {
-    z-index: 10002 !important;
-    width: 220px !important;
-  }
-
-  .ant-divider-horizontal.ant-divider-with-text,
-  .ant-divider-horizontal.ant-divider-with-text-left,
-  .ant-divider-horizontal.ant-divider-with-text-right {
-    font-weight: 800;
-    margin: 24px 0 4px;
-  }
-</style>

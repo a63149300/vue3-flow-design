@@ -105,9 +105,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, unref, watch, onMounted, PropType } from 'vue';
+  import { ref, unref, watch, onMounted, PropType, reactive } from 'vue';
   import { Resizable } from 'resizable-dom';
-  import { flowConfig } from '/@/config/args-config';
   import { CommonNodeType, HighNodeType, LaneNodesType } from '/@/type/enums';
   import { INode, ILink, IElement } from '/@/type/index';
 
@@ -119,6 +118,10 @@
     selectGroup: {
       type: Array as PropType<INode[]>,
       default: () => [],
+    },
+    config: {
+      type: Object,
+      default: () => ({}),
     },
     node: {
       type: Object as PropType<INode>,
@@ -143,6 +146,8 @@
     'isMultiple',
     'showNodeContextMenu',
   ]);
+
+  const flowConfig = reactive(props.config);
 
   let currentSelect = ref(props.select);
 

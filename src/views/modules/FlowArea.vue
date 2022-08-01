@@ -41,6 +41,7 @@
         :key="node.id"
         :node="node"
         :plumb="plumb"
+        :config="config"
         v-model:select="currentSelect"
         v-model:selectGroup="currentSelectGroup"
         :currentTool="currentTool"
@@ -81,7 +82,6 @@
 <script lang="ts" setup>
   import { reactive, ref, computed, watch, unref, PropType } from 'vue';
   import { message } from 'ant-design-vue';
-  import { flowConfig } from '/@/config/args-config';
   import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';
   import { useContextMenu } from '/@/hooks/useContextMenu';
@@ -90,6 +90,10 @@
 
   const props = defineProps({
     flowData: {
+      type: Object,
+      default: () => ({}),
+    },
+    config: {
       type: Object,
       default: () => ({}),
     },
@@ -114,6 +118,8 @@
       default: () => ({}),
     },
   });
+
+  const flowConfig = reactive(props.config);
 
   const emits = defineEmits([
     'findNodeConfig',

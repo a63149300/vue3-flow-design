@@ -62,13 +62,13 @@
                 <component :is="flowData.config.showGridIcon" />
               </a-button>
             </a-tooltip>
-            <!-- <a-tooltip title="设置" placement="bottom">
+            <a-tooltip title="设置" placement="bottom">
               <a-button @click="setting" class="header-option-button" size="small">
                 <template #icon>
                   <component :is="'SettingOutlined'" />
                 </template>
               </a-button>
-            </a-tooltip> -->
+            </a-tooltip>
             <a-tooltip title="测试" placement="bottom">
               <a-button @click="openTest" class="header-option-button" size="small">
                 <template #icon>
@@ -107,6 +107,7 @@
             ref="flowAreaRef"
             :dragInfo="dragInfo"
             :flowData="flowData"
+            :config="flowConfig"
             v-model:select="currentSelect"
             v-model:selectGroup="currentSelectGroup"
             :plumb="plumb"
@@ -141,7 +142,7 @@
       <img :src="flowPicture.url" style="width: 100%" />
     </a-modal> -->
     <!-- 设置 -->
-    <!-- <setting-modal ref="settingModalRef" /> -->
+    <setting-modal ref="settingModalRef" v-model:config="flowConfig" />
     <!-- 快捷键大全 -->
     <ShortcutModal ref="shortcutModalRef" />
     <!-- 测试 -->
@@ -158,17 +159,19 @@
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
-  // import SettingModal from './modules/SettingModal.vue';
+  import SettingModal from './modules/SettingModal.vue';
   import ShortcutModal from './modules/ShortcutModal.vue';
   import TestModal from './modules/TestModal.vue';
   import { tools, commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
-  import { flowConfig } from '/@/config/args-config';
+  import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
   import { IDragInfo, IElement, INode, ILink } from '/@/type/index';
   import { ToolsTypeEnum, LaneNodesType } from '/@/type/enums';
   import { utils } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
 
   const [createContextMenu] = useContextMenu();
+
+  const flowConfig = reactive(defaultFlowConfig);
 
   const plumb = ref<any>({});
   const field = reactive({
@@ -182,7 +185,7 @@
 
   const flowAreaRef = ref();
 
-  // const settingModalRef = ref();
+  const settingModalRef = ref();
 
   const shortcutModalRef = ref();
 
@@ -591,7 +594,7 @@
       if (e.ctrlKey) {
         switch (key) {
           case flowConfig.shortcut.settingModal.code:
-            // setting();
+            setting();
             break;
           case flowConfig.shortcut.testModal.code:
             openTest();
@@ -662,9 +665,9 @@
   }
 
   // 设置
-  // function setting() {
-  //   settingModalRef.value.open();
-  // }
+  function setting() {
+    settingModalRef.value.open();
+  }
 
   // 快捷键大全
   function shortcutHelper() {

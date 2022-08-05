@@ -35,13 +35,13 @@
           </div>
           <!-- 工具区 -->
           <div class="header-option__buttons">
-            <!-- <a-tooltip title="生成流程图片" placement="bottom">
+            <a-tooltip title="生成流程图片" placement="bottom">
               <a-button @click="exportFlowPicture" class="header-option-button" size="small">
                 <template #icon>
                   <component :is="'PictureOutlined'" />
                 </template>
               </a-button>
-            </a-tooltip> -->
+            </a-tooltip>
             <a-popconfirm
               title="确认要重新绘制吗？"
               placement="bottom"
@@ -127,7 +127,7 @@
       </a-layout-sider>
     </a-layout>
     <!-- 生成流程图片 -->
-    <!-- <a-modal
+    <a-modal
       :title="'流程设计图_' + flowData.attr.id + '.png'"
       centered
       width="90%"
@@ -140,7 +140,7 @@
       @cancel="cancelDownLoadFlowPicture"
     >
       <img :src="flowPicture.url" style="width: 100%" />
-    </a-modal> -->
+    </a-modal>
     <!-- 设置 -->
     <setting-modal ref="settingModalRef" v-model:config="flowConfig" />
     <!-- 快捷键大全 -->
@@ -154,8 +154,8 @@
   import { jsPlumb, Defaults } from 'jsplumb';
   import { reactive, ref, onMounted, nextTick, unref } from 'vue';
   import { message } from 'ant-design-vue';
-  // import canvg from 'canvg';
-  // import html2canvas from 'html2canvas';
+  import canvg from 'canvg';
+  import html2canvas from 'html2canvas';
   import NodeList from './modules/NodeList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
@@ -212,12 +212,12 @@
   // 画布聚焦开启快捷键
   let activeShortcut = true;
 
-  // const flowPicture = reactive({
-  //   url: '',
-  //   modalVisible: false,
-  //   closable: false,
-  //   maskClosable: false,
-  // });
+  const flowPicture = reactive({
+    url: '',
+    modalVisible: false,
+    closable: false,
+    maskClosable: false,
+  });
 
   const dragInfo = reactive<IDragInfo>({
     type: '',
@@ -680,70 +680,65 @@
   }
 
   // 生成流程图片
-  // function exportFlowPicture() {
-  //   if (!checkFlow()) return;
+  function exportFlowPicture() {
+    if (!checkFlow()) return;
 
-  //   let $Container = flowAreaRef.value.$el.children[0],
-  //     svgElems = $Container.querySelectorAll('svg[id^="link-"]'),
-  //     removeArr = [];
+    let $Container = flowAreaRef.value.$el.children[0];
+    let svgElems = $Container.querySelectorAll('svg[id^="link-"]');
+    let removeArr: string[] = [];
 
-  //   console.log(flowAreaRef.value);
+    svgElems.forEach((svgElem: HTMLElement) => {
+      let linkCanvas = document.createElement('canvas');
+      let canvasId = 'linkCanvas-' + utils.getId();
+      linkCanvas.id = canvasId;
+      removeArr.push(canvasId);
 
-  //   svgElems.forEach((svgElem) => {
-  //     let linkCanvas = document.createElement('canvas');
-  //     let canvasId = 'linkCanvas-' + utils.getId();
-  //     linkCanvas.id = canvasId;
-  //     removeArr.push(canvasId);
+      let svgContent = svgElem.outerHTML.trim();
+      canvg(linkCanvas, svgContent);
+      if (svgElem.style.position) {
+        linkCanvas.style.position += svgElem.style.position;
+        linkCanvas.style.left += svgElem.style.left;
+        linkCanvas.style.top += svgElem.style.top;
+      }
+      $Container.appendChild(linkCanvas);
+    });
 
-  //     let svgContent = svgElem.outerHTML.trim();
-  //     canvg(linkCanvas, svgContent);
-  //     if (svgElem.style.position) {
-  //       linkCanvas.style.position += svgElem.style.position;
-  //       linkCanvas.style.left += svgElem.style.left;
-  //       linkCanvas.style.top += svgElem.style.top;
-  //     }
-  //     $Container.appendChild(linkCanvas);
-  //   });
+    let canvasSize = computeCanvasSize();
 
-  //   let canvasSize = computeCanvasSize();
+    let pbd = flowConfig.defaultStyle.photoBlankDistance;
 
-  //   let pbd = flowConfig.defaultStyle.photoBlankDistance;
-  //   let offsetPbd = utils.div(pbd, 2);
-
-  //   html2canvas($Container, {
-  //     width: canvasSize.width + pbd,
-  //     height: canvasSize.height + pbd,
-  //     scrollX: -canvasSize.minX + offsetPbd,
-  //     scrollY: -canvasSize.minY + offsetPbd,
-  //     logging: false,
-  //     onclone: () => {
-  //       removeArr.forEach((id) => {
-  //         let currentNode = document.querySelector('#' + id);
-  //         currentNode.parentNode.removeChild(currentNode);
-  //       });
-  //     },
-  //   }).then((canvas) => {
-  //     let dataURL = canvas.toDataURL('image/png');
-  //     flowPicture.url = dataURL;
-  //     flowPicture.modalVisible = true;
-  //   });
-  // }
+    html2canvas($Container, {
+      width: canvasSize.width + pbd,
+      height: canvasSize.height + pbd,
+      logging: false,
+      onclone: () => {
+        removeArr.forEach((id) => {
+          let currentNode = document.querySelector('#' + id);
+          currentNode?.parentNode?.removeChild(currentNode);
+        });
+      },
+    }).then((canvas) => {
+      let dataURL = canvas.toDataURL('image/png');
+      flowPicture.url = dataURL;
+      flowPicture.modalVisible = true;
+    });
+  }
 
   // 下载图片
-  // function downLoadFlowPicture() {
-  //   let alink = document.createElement('a');
-  //   let alinkId = 'alink-' + utils.getId();
-  //   alink.id = alinkId;
-  //   alink.href = flowPicture.url;
-  //   alink.download = '流程设计图_' + flowData.attr.id + '.png';
-  //   alink.click();
-  // }
+  function downLoadFlowPicture() {
+    let alink = document.createElement('a');
+    let alinkId = 'alink-' + utils.getId();
+    alink.id = alinkId;
+    alink.href = flowPicture.url;
+    alink.download = '流程设计图_' + flowData.attr.id + '.png';
+    alink.click();
+  }
 
   // 取消下载
-  // function cancelDownLoadFlowPicture() {
-  //   flowPicture.url = '';
-  //   flowPicture.modalVisible = false;
-  // }
+  function cancelDownLoadFlowPicture() {
+    flowPicture.url = '';
+    flowPicture.modalVisible = false;
+  }
 
   onMounted(() => {
     // 实例化JsPlumb

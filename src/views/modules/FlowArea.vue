@@ -138,8 +138,8 @@
 
   const container = reactive({
     pos: {
-      top: -4000,
-      left: -4000,
+      top: 0,
+      left: 0,
     },
     dragFlag: false,
     draging: false,

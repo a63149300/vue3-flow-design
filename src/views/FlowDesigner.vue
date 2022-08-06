@@ -706,10 +706,13 @@
     let canvasSize = computeCanvasSize();
 
     let pbd = flowConfig.defaultStyle.photoBlankDistance;
+    let offsetPbd = utils.div(pbd, 2);
 
     html2canvas($Container, {
-      width: canvasSize.width + pbd,
-      height: canvasSize.height + pbd,
+      width: canvasSize.maxX + offsetPbd,
+      height: canvasSize.maxY + offsetPbd,
+      scrollX: 0,
+      scrollY: 0,
       logging: false,
       onclone: () => {
         removeArr.forEach((id) => {

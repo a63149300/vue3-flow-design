@@ -33,6 +33,7 @@ specifiers:
   vite: ^3.0.0
   vue: ^3.2.37
   vue-eslint-parser: ^8.0.1
+  vue-lsp: ^1.0.2
   vue-tsc: ^0.38.4
   vue3-colorpicker: ^2.0.4
   vue3-json-viewer: ^2.2.2
@@ -45,6 +46,7 @@ dependencies:
   jsplumb: 2.15.6
   resizable-dom: 1.0.2
   vue: 3.2.37
+  vue-lsp: 1.0.2
   vue3-colorpicker: 2.0.4_vue@3.2.37
   vue3-json-viewer: 2.2.2_vue@3.2.37
 
@@ -2057,6 +2059,11 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
 
+  /js-cookie/3.0.1:
+    resolution: {integrity: sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==}
+    engines: {node: '>=12'}
+    dev: false
+
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -3148,6 +3155,12 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /vue-lsp/1.0.2:
+    resolution: {integrity: sha512-2SAmfIcTPqSokrgU9rVSxlh6pf+NhvR95EELWyH1qTM6v6aeAcD4R3WW6lyRI66Ams9esYjiZdrDy3hevQ1bJw==}
+    dependencies:
+      js-cookie: 3.0.1
+    dev: false
 
   /vue-tsc/0.38.9_typescript@4.7.4:
     resolution: {integrity: sha512-Yoy5phgvGqyF98Fb4mYqboR4Q149jrdcGv5kSmufXJUq++RZJ2iMVG0g6zl+v3t4ORVWkQmRpsV4x2szufZ0LQ==}

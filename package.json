@@ -15,6 +15,7 @@
     "jsplumb": "^2.15.6",
     "resizable-dom": "^1.0.2",
     "vue": "^3.2.37",
+    "vue3-colorpicker": "^2.0.4",
     "vue3-json-viewer": "^2.2.2"
   },
   "devDependencies": {

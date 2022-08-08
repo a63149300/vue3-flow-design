@@ -3,7 +3,7 @@
     title="设置"
     :zIndex="1001"
     placement="right"
-    :width="600"
+    :width="400"
     :visible="settingVisible"
     @close="close"
   >
@@ -49,16 +49,15 @@
           <a-select-option value="StateMachine">状态线</a-select-option>
         </a-select>
       </a-form-item>
-      <!-- <a-form-item
+      <a-form-item
         label="颜色"
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
       >
-        <colorPicker
-          v-model:value="flowConfig.jsPlumbInsConfig.PaintStyle.stroke"
-          @change="setLinkColor"
-        />
-      </a-form-item> -->
+        <div @click="handleColorPicker">
+          <color-picker v-model:pureColor="flowConfig.jsPlumbInsConfig.PaintStyle.stroke" />
+        </div>
+      </a-form-item>
       <a-form-item
         label="粗细"
         :label-col="formItemLayout.labelCol"
@@ -121,6 +120,8 @@
 
 <script lang="ts" setup>
   import { reactive, ref, watch } from 'vue';
+  import { ColorPicker } from 'vue3-colorpicker';
+  import 'vue3-colorpicker/style.css';
 
   const props = defineProps({
     config: {
@@ -154,6 +155,12 @@
 
   function close() {
     settingVisible.value = false;
+  }
+
+  // 手动触发resize，修复ColorPicker位置
+  function handleColorPicker() {
+    const myEvent = new Event('resize');
+    window.dispatchEvent(myEvent);
   }
 
   function formatterContainerOnceNarrow(v: number) {

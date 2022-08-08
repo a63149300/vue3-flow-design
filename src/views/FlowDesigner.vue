@@ -293,10 +293,9 @@
       currentSelectGroup.value = [];
       flowData.status = flowConfig.flowStatus.MODIFY;
     }, true);
-    let canvasSize = computeCanvasSize();
     flowAreaRef.value.container.pos = {
-      top: -canvasSize.minY + 100,
-      left: -canvasSize.minX + 100,
+      top: 0,
+      left: 0,
     };
   }
 

@@ -675,7 +675,7 @@
 
   // 使用文档
   function usingDoc() {
-    window.open('https://gitee.com/zhangyeping/vue-flow-design-plus');
+    window.open('https://gitee.com/zhangyeping/vue3-flow-design');
   }
 
   // 生成流程图片

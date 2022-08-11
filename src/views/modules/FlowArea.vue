@@ -28,7 +28,7 @@
         canMultiple: rectangleMultiple.flag,
       }"
       :style="gridStyle"
-      @click.stop="containerHandler"
+      @click="containerHandler"
       @mousedown="mousedownHandler"
       @mousemove="mousemoveHandler"
       @mouseup="mouseupHandler"

@@ -87,9 +87,10 @@
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { CommonNodeType, LaneNodesType } from '/@/type/enums';
   import { INode, ILink, IElement, IDragInfo } from '/@/type/index';
+  import { ToolsTypeEnum } from '/@/type/enums';
 
   const props = defineProps({
-    flowData: {
+    data: {
       type: Object,
       default: () => ({}),
     },
@@ -119,7 +120,11 @@
     },
   });
 
+  // 流程配置
   const flowConfig = reactive(props.config);
+
+  // 流程DSL数据
+  const flowData = ref(props.data);
 
   const emits = defineEmits([
     'findNodeConfig',
@@ -128,6 +133,7 @@
     'saveFlow',
     'update:select',
     'update:selectGroup',
+    'update:data',
   ]);
 
   const [createContextMenu] = useContextMenu();
@@ -214,7 +220,7 @@
     let type = props.dragInfo.type;
 
     // 复位拖拽工具
-    emits('selectTool', 'drag');
+    emits('selectTool', ToolsTypeEnum.DRAG);
 
     emits('findNodeConfig', belongTo, type, (node) => {
       if (!node) {
@@ -326,7 +332,8 @@
       newNode.height = 500;
       newNode.width = 200;
     }
-    props.flowData.nodeList.push(newNode);
+    unref(flowData).nodeList.push(newNode);
+    emits('update:data', unref(flowData));
   }
 
   // 画布鼠标按下
@@ -366,7 +373,7 @@
     let by = ay + rectangleMultiple.height;
     let bx = ax + rectangleMultiple.width;
 
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     nodeList.forEach((node) => {
       if (node.y >= ay && node.x >= ax && node.y <= by && node.x <= bx) {
         props.plumb.addToDragSelection(node.id);
@@ -509,8 +516,8 @@
 
   // 流程图信息
   function flowInfo() {
-    let nodeList = props.flowData.nodeList;
-    let linkList = props.flowData.linkList;
+    let nodeList = unref(flowData).nodeList;
+    let linkList = unref(flowData).linkList;
     message.info(
       '当前流程图中有 ' + nodeList.length + ' 个节点，有 ' + linkList.length + ' 条连线。',
     );
@@ -526,13 +533,14 @@
       newNode.x = nodePos.x;
       newNode.y = nodePos.y;
       dis += 20;
-      props.flowData.nodeList.push(newNode);
+      flowData.value.nodeList.push(newNode);
+      emits('update:data', unref(flowData));
     });
   }
 
   // 全选
   function selectAll() {
-    props.flowData.nodeList.forEach((node) => {
+    unref(flowData).nodeList.forEach((node) => {
       props.plumb.addToDragSelection(node.id);
       currentSelectGroup.value.push(node);
     });
@@ -555,7 +563,7 @@
   // 垂直左对齐
   function verticaLeft() {
     if (!checkAlign()) return;
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
     let baseX = selectGroup[0].x;
     let baseY = selectGroup[0].y;
@@ -581,7 +589,7 @@
   // 垂直居中
   function verticalCenter() {
     if (!checkAlign()) return;
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
     let baseX = selectGroup[0].x;
     let baseY = selectGroup[0].y;
@@ -609,7 +617,7 @@
   // 垂直右对齐
   function verticalRight() {
     if (!checkAlign()) return;
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
     let baseX = selectGroup[0].x;
     let baseY = selectGroup[0].y;
@@ -637,7 +645,7 @@
   // 水平上对齐
   function levelUp() {
     if (!checkAlign()) return;
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
     let baseX = selectGroup[0].x;
     let baseY = selectGroup[0].y;
@@ -663,7 +671,7 @@
   // 水平居中
   function levelCenter() {
     if (!checkAlign()) return;
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
     let baseX = selectGroup[0].x;
     let baseY = selectGroup[0].y;
@@ -691,7 +699,7 @@
   // 水平下对齐
   function levelDown() {
     if (!checkAlign()) return;
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
     let baseX = selectGroup[0].x;
     let baseY = selectGroup[0].y;
@@ -739,13 +747,13 @@
 
   // 删除节点
   function deleteNode() {
-    let nodeList = props.flowData.nodeList;
-    let linkList = props.flowData.linkList;
+    let nodeList = unref(flowData).nodeList;
+    let linkList = unref(flowData).linkList;
     let arr: INode[] = [];
 
     arr.push(Object.assign({}, unref(currentSelect) as INode));
 
-    props.flowData.status = flowConfig.flowStatus.LOADING;
+    flowData.value.status = flowConfig.flowStatus.LOADING;
 
     arr.forEach((c) => {
       let conns = getConnectionsByNodeId(c.id);
@@ -766,7 +774,8 @@
       let inx = nodeList.findIndex((node) => node.id === c.id);
       nodeList.splice(inx, 1);
     });
-    props.flowData.status = flowConfig.flowStatus.CREATE;
+    flowData.value.status = flowConfig.flowStatus.CREATE;
+    emits('update:data', unref(flowData));
     selectContainer();
   }
 
@@ -786,7 +795,7 @@
   }
   // 更新组节点信息
   function updateNodePos() {
-    let nodeList = props.flowData.nodeList;
+    let nodeList = unref(flowData).nodeList;
     currentSelectGroup.value.forEach((node) => {
       let dom = document.querySelector('#' + node.id) as HTMLElement;
       let l = parseInt(dom?.style?.left);
@@ -802,7 +811,7 @@
     if (props.selectGroup.length > 1) return;
     if (container.auxiliaryLine.controlFnTimesFlag) {
       let elId = e.el.id;
-      let nodeList = props.flowData.nodeList;
+      let nodeList = unref(flowData).nodeList;
       nodeList.forEach((node) => {
         if (elId !== node.id) {
           let dis = flowConfig.defaultStyle.showAuxiliaryLineDistance,

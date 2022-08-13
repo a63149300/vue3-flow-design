@@ -106,7 +106,7 @@
           <flow-area
             ref="flowAreaRef"
             :dragInfo="dragInfo"
-            :flowData="flowData"
+            v-model:data="flowData"
             :config="flowConfig"
             v-model:select="currentSelect"
             v-model:selectGroup="currentSelectGroup"

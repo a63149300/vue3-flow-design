@@ -149,6 +149,9 @@
 
   const flowConfig = reactive(props.config);
 
+  // 当前节点信息
+  const currentNode = reactive(props.node);
+
   let currentSelect = ref(props.select);
 
   let currentSelectGroup = ref(props.selectGroup);
@@ -180,7 +183,7 @@
 
   // 初始节点拖拽
   function registerNode() {
-    props?.plumb?.draggable(props.node.id, {
+    props?.plumb?.draggable(currentNode.id, {
       containment: 'parent',
       handle: (e, el) => {
         // 判断节点类型
@@ -199,8 +202,9 @@
         }
       },
       stop: (e) => {
-        props.node.x = e.pos[0];
-        props.node.y = e.pos[1];
+        currentNode.x = e.pos[0];
+        currentNode.y = e.pos[1];
+
         // 是否为组
         if (currentSelectGroup.value.length > 1) {
           // 更新组节点信息
@@ -211,8 +215,8 @@
       },
     });
 
-    if (props.node.type === LaneNodesType.X_LANE || props.node.type === LaneNodesType.Y_LANE) {
-      let node = document.querySelector('#' + props.node.id) as HTMLElement;
+    if (currentNode.type === LaneNodesType.X_LANE || currentNode.type === LaneNodesType.Y_LANE) {
+      let node = document.querySelector('#' + currentNode.id) as HTMLElement;
       new Resizable(
         node,
         {
@@ -225,25 +229,25 @@
           },
         },
         () => {
-          props.node.height = Math.ceil(parseInt(node.style.height));
-          props.node.width = Math.ceil(parseInt(node.style.width));
+          currentNode.height = Math.ceil(parseInt(node.style.height));
+          currentNode.width = Math.ceil(parseInt(node.style.width));
         },
       );
     }
-    currentSelect.value = props.node;
+    currentSelect.value = currentNode;
     currentSelectGroup.value = [];
   }
   // 点击节点
   function selectNode() {
-    currentSelect.value = props.node;
+    currentSelect.value = currentNode;
     emits('isMultiple', (flag) => {
       if (!flag) {
         currentSelectGroup.value = [];
       } else {
-        let f = unref(currentSelectGroup).filter((s) => s.id === props.node.id);
+        let f = unref(currentSelectGroup).filter((s) => s.id === currentNode.id);
         if (f.length <= 0) {
-          props.plumb.addToDragSelection(props.node.id);
-          currentSelectGroup.value.push(props.node);
+          props.plumb.addToDragSelection(currentNode.id);
+          currentSelectGroup.value.push(currentNode);
         }
       }
     });
@@ -258,8 +262,8 @@
     if (!unref(currentSelect)) {
       return false;
     }
-    if (unref(currentSelect).id === props.node.id) return true;
-    let f = unref(currentSelectGroup).find((n) => n.id === props.node.id);
+    if (unref(currentSelect).id === currentNode.id) return true;
+    let f = unref(currentSelectGroup).find((n) => n.id === currentNode.id);
     return !!f;
   }
 

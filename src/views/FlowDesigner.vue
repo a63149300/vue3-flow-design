@@ -146,7 +146,7 @@
     <!-- 快捷键大全 -->
     <ShortcutModal ref="shortcutModalRef" />
     <!-- 测试 -->
-    <TestModal ref="testModalRef" @loadFlow="loadFlow" />
+    <TestModal v-model:testVisible="testVisible" :flowData="flowData" @loadFlow="loadFlow" />
   </div>
 </template>
 
@@ -189,8 +189,7 @@
 
   const shortcutModalRef = ref();
 
-  // 测试Ref
-  const testModalRef = ref();
+  const testVisible = ref<boolean>(false);
 
   const flowData = reactive<Recordable>({
     nodeList: [],
@@ -658,9 +657,7 @@
 
   // 测试
   function openTest() {
-    let flowObj = Object.assign({}, flowData);
-    testModalRef.value.flowData = flowObj;
-    testModalRef.value.testVisible = true;
+    testVisible.value = true;
   }
 
   // 设置

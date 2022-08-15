@@ -24,14 +24,23 @@
   import { flowConfig } from '/@/config/args-config';
   import 'vue3-json-viewer/dist/index.css';
 
-  const emits = defineEmits(['loadFlow']);
+  const props = defineProps({
+    testVisible: {
+      type: Boolean,
+      default: false,
+    },
+    flowData: {
+      type: Object,
+      default: () => ({}),
+    },
+  });
 
-  const testVisible = ref<boolean>(false);
-  const flowData = ref({});
+  const emits = defineEmits(['loadFlow', 'update:testVisible']);
+
   const flowDataJson = ref<string>('');
 
   function onClose() {
-    testVisible.value = false;
+    emits('update:testVisible', false);
   }
 
   // 编辑框
@@ -41,7 +50,7 @@
 
   // 暂存
   function tempSave() {
-    let tempObj = Object.assign({}, unref(flowData));
+    let tempObj = Object.assign({}, props.flowData);
     tempObj.status = flowConfig.flowStatus.SAVE;
     flowDataJson.value = JSON.stringify(tempObj);
   }
@@ -51,9 +60,4 @@
     emits('loadFlow', unref(flowDataJson));
     onClose();
   }
-
-  defineExpose({
-    flowData,
-    testVisible,
-  });
 </script>

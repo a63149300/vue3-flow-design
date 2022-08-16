@@ -42,6 +42,7 @@
                 </template>
               </a-button>
             </a-tooltip>
+
             <a-popconfirm
               title="确认要重新绘制吗？"
               placement="bottom"
@@ -57,11 +58,13 @@
                 </a-button>
               </a-tooltip>
             </a-popconfirm>
+
             <a-tooltip :title="flowData.config.showGridText" placement="bottom">
               <a-button @click="toggleShowGrid" class="header-option-button" size="small">
                 <component :is="flowData.config.showGridIcon" />
               </a-button>
             </a-tooltip>
+
             <a-tooltip title="设置" placement="bottom">
               <a-button @click="setting" class="header-option-button" size="small">
                 <template #icon>
@@ -69,6 +72,7 @@
                 </template>
               </a-button>
             </a-tooltip>
+
             <a-tooltip title="测试" placement="bottom">
               <a-button @click="openTest" class="header-option-button" size="small">
                 <template #icon>
@@ -76,23 +80,15 @@
                 </template>
               </a-button>
             </a-tooltip>
-            <a-popconfirm
-              title="请选择帮助项："
-              placement="bottom"
-              okType="default"
-              okText="快捷键大全"
-              cancelText="使用文档"
-              @confirm="shortcutHelper"
-              @cancel="usingDoc"
-            >
-              <a-tooltip title="帮助" placement="bottom">
-                <a-button class="header-option-button" size="small">
-                  <template #icon>
-                    <component :is="'BookOutlined'" />
-                  </template>
-                </a-button>
-              </a-tooltip>
-            </a-popconfirm>
+
+            <a-tooltip title="快捷键大全" placement="bottom">
+              <a-button @click="shortcutHelper" class="header-option-button" size="small">
+                <template #icon>
+                  <component :is="'BookOutlined'" />
+                </template>
+              </a-button>
+            </a-tooltip>
+
             <a-tooltip title="保存流程" placement="bottom">
               <a-button @click="saveFlow" class="header-option-button" size="small">
                 <template #icon>
@@ -119,7 +115,14 @@
           />
         </a-layout-content>
         <a-layout-footer class="foot">
-          <span>Vue3-Flow-Design 1.0.0 , Powered by 前端爱码士</span>
+          <span>Vue3-Flow-Design, Powered by 前端爱码士</span>
+          <a-tooltip title="GIT地址" placement="top">
+            <a-button @click="goGit" type="link" size="small">
+              <template #icon>
+                <component :is="'GithubOutlined'" />
+              </template>
+            </a-button>
+          </a-tooltip>
         </a-layout-footer>
       </a-layout>
       <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
@@ -563,7 +566,8 @@
       let key = e.code;
 
       switch (key) {
-        case flowConfig.shortcut.multiple.code:
+        case flowConfig.shortcut.multiple.code.split(',')[0]:
+        case flowConfig.shortcut.multiple.code.split(',')[1]:
           flowAreaRef.value.rectangleMultiple.flag = true;
           break;
         case flowConfig.shortcut.dragContainer.code:
@@ -592,7 +596,7 @@
       if (e.ctrlKey) {
         switch (key) {
           case flowConfig.shortcut.settingModal.code:
-            setting();
+            saveFlow();
             break;
           case flowConfig.shortcut.testModal.code:
             openTest();
@@ -605,7 +609,7 @@
       let key = event.code;
       if (key === flowConfig.shortcut.dragContainer.code) {
         flowAreaRef.value.container.dragFlag = false;
-      } else if (key === flowConfig.shortcut.multiple.code) {
+      } else if (flowConfig.shortcut.multiple.code.includes(key)) {
         flowAreaRef.value.rectangleMultiple.flag = false;
       }
     };
@@ -670,8 +674,8 @@
     shortcutModalRef.value.open();
   }
 
-  // 使用文档
-  function usingDoc() {
+  // GIT地址
+  function goGit() {
     window.open('https://gitee.com/zhangyeping/vue3-flow-design');
   }
 

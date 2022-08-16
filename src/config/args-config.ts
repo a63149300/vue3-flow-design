@@ -88,8 +88,8 @@ export const flowConfig = {
   },
   shortcut: {
     multiple: {
-      code: 'ControlLeft',
-      codeName: 'CTRL',
+      code: 'ShiftLeft,ShiftRight',
+      codeName: 'SHIFT',
       shortcutName: '多选',
     },
     dragContainer: {
@@ -129,13 +129,13 @@ export const flowConfig = {
     },
     settingModal: {
       code: 'KeyS',
-      codeName: 'CTRL+S',
-      shortcutName: '打开设置页面',
+      codeName: 'CTRL + S',
+      shortcutName: '保存页面',
     },
     testModal: {
       code: 'KeyT',
-      codeName: 'CTRL+T',
-      shortcutName: '打开测试页面',
+      codeName: 'CTRL + T',
+      shortcutName: '测试页面',
     },
   },
 };

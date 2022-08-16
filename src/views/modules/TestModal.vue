@@ -1,21 +1,19 @@
 <template>
-  <div>
-    <a-drawer title="测试" placement="right" :width="600" :visible="testVisible" @close="onClose">
-      <div>当前的flowData:</div>
-      <json-viewer :value="flowData" :expand-depth="3" boxed copyable />
+  <a-drawer title="测试" placement="right" :width="600" :visible="testVisible" @close="onClose">
+    <div>当前的flowData:</div>
+    <json-viewer :value="flowData" :expand-depth="3" boxed copyable />
 
-      <div style="margin-top: 12px">暂存:</div>
-      <a-textarea
-        :autoSize="{ minRows: 10, maxRows: 100 }"
-        :value="flowDataJson"
-        @change="editFlowDataJson"
-      />
+    <div style="margin-top: 12px">暂存:</div>
+    <a-textarea
+      :autoSize="{ minRows: 10, maxRows: 100 }"
+      :value="flowDataJson"
+      @change="editFlowDataJson"
+    />
 
-      <a-divider />
-      <a-button @click="tempSave" :style="{ marginRight: '8px' }">暂存</a-button>
-      <a-button @click="onLoad" type="primary">加载(暂存中的json数据)</a-button>
-    </a-drawer>
-  </div>
+    <a-divider />
+    <a-button @click="tempSave" :style="{ marginRight: '8px' }">暂存</a-button>
+    <a-button @click="onLoad" type="primary">加载(暂存中的json数据)</a-button>
+  </a-drawer>
 </template>
 
 <script lang="ts" setup>

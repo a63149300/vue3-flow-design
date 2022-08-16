@@ -26,6 +26,7 @@ const ICON_LIST = [
   'BranchesOutlined',
   'EyeOutlined',
   'EyeInvisibleOutlined',
+  'GithubOutlined',
 ];
 
 export function registerIconsComp(app: App) {

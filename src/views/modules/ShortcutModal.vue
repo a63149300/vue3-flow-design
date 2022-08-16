@@ -1,15 +1,19 @@
 <template>
   <a-modal
     title="快捷键大全"
-    width="60%"
+    width="600px"
     :visible="modalVisible"
-    okText="确认"
-    cancelText="取消"
     wrapClassName="shortcutModal"
-    @ok="saveSetting"
-    @cancel="cancel"
+    :footer="null"
+    @cancel="close"
   >
-    <a-table size="small" rowKey="code" :columns="columns" :dataSource="dataSource" />
+    <a-table
+      size="small"
+      rowKey="code"
+      :columns="columns"
+      :dataSource="dataSource"
+      :pagination="false"
+    />
   </a-modal>
 </template>
 
@@ -41,23 +45,12 @@
 
   function open() {
     modalVisible.value = true;
-    let obj = Object.assign({}, flowConfig.shortcut);
-    for (let k in obj) {
-      dataSource.value.push(obj[k]);
-    }
+    dataSource.value = Object.values(flowConfig.shortcut);
   }
 
   function close() {
-    dataSource.value = [];
     modalVisible.value = false;
-  }
-
-  function saveSetting() {
-    close();
-  }
-
-  function cancel() {
-    close();
+    dataSource.value = [];
   }
 
   defineExpose({

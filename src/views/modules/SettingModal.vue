@@ -3,7 +3,7 @@
     title="设置"
     :zIndex="1001"
     placement="right"
-    :width="400"
+    :width="500"
     :visible="settingVisible"
     @close="close"
   >
@@ -137,20 +137,12 @@
   const settingVisible = ref<boolean>(false);
 
   const formItemLayout = reactive({
-    labelCol: { span: 6 },
-    wrapperCol: { span: 15 },
+    labelCol: { span: 7 },
+    wrapperCol: { span: 16 },
   });
-
-  let initFlag = false;
-
-  async function init() {}
 
   function open() {
     settingVisible.value = true;
-    if (!initFlag) {
-      init();
-      initFlag = true;
-    }
   }
 
   function close() {

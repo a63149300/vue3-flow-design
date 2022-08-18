@@ -2,7 +2,7 @@
   <a-list :grid="{ gutter: 0, column: 1 }">
     <a-list-item v-for="node in nodeList" :key="node.type">
       <a-tooltip :title="node.nodeName" placement="right">
-        <div class="node-item" draggable="true" @dragstart="dragNode(node.type, type)">
+        <div class="node-item" draggable="true" @dragstart="dragNode(node.type, belongTo)">
           <component :is="node.icon" />
         </div>
       </a-tooltip>
@@ -18,7 +18,7 @@
       type: Array as PropType<IElement[]>,
       default: () => [],
     },
-    type: {
+    belongTo: {
       type: String,
       default: '',
     },
@@ -34,4 +34,3 @@
     });
   }
 </script>
-<style scoped lang="less"></style>

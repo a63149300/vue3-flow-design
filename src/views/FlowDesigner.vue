@@ -4,15 +4,27 @@
       <a-layout-sider width="44" class="select-area">
         <a-row>
           <div class="tab">基础</div>
-          <node-list :nodeList="field.commonNodes" type="commonNodes" @setDragInfo="setDragInfo" />
+          <element-list
+            :nodeList="field.commonNodes"
+            belongTo="commonNodes"
+            @setDragInfo="setDragInfo"
+          />
         </a-row>
         <a-row>
           <div class="tab">高级</div>
-          <node-list :nodeList="field.highNodes" type="highNodes" @setDragInfo="setDragInfo" />
+          <element-list
+            :nodeList="field.highNodes"
+            belongTo="highNodes"
+            @setDragInfo="setDragInfo"
+          />
         </a-row>
         <a-row>
           <div class="tab">泳道</div>
-          <node-list :nodeList="field.laneNodes" type="laneNodes" @setDragInfo="setDragInfo" />
+          <element-list
+            :nodeList="field.laneNodes"
+            belongTo="laneNodes"
+            @setDragInfo="setDragInfo"
+          />
         </a-row>
       </a-layout-sider>
       <a-layout>
@@ -159,7 +171,7 @@
   import { message } from 'ant-design-vue';
   import canvg from 'canvg';
   import html2canvas from 'html2canvas';
-  import NodeList from './modules/NodeList.vue';
+  import ElementList from './modules/ElementList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
   import SettingModal from './modules/SettingModal.vue';

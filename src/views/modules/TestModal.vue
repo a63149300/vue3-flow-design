@@ -3,15 +3,15 @@
     <div>当前的flowData:</div>
     <json-viewer :value="flowData" :expand-depth="3" boxed copyable />
 
-    <div style="margin-top: 12px">暂存:</div>
+    <div style="margin-top: 16px">暂存:</div>
     <a-textarea
-      :autoSize="{ minRows: 10, maxRows: 100 }"
+      :autoSize="{ minRows: 6, maxRows: 100 }"
       :value="flowDataJson"
       @change="editFlowDataJson"
     />
 
     <a-divider />
-    <a-button @click="tempSave" :style="{ marginRight: '8px' }">暂存</a-button>
+    <a-button @click="tempSave" style="margin-right: 8px">暂存</a-button>
     <a-button @click="onLoad" type="primary">加载(暂存中的json数据)</a-button>
   </a-drawer>
 </template>
@@ -21,6 +21,7 @@
   import { JsonViewer } from 'vue3-json-viewer';
   import { flowConfig } from '/@/config/args-config';
   import 'vue3-json-viewer/dist/index.css';
+  import { ChangeEvent } from 'ant-design-vue/lib/_util/EventInterface';
 
   const props = defineProps({
     testVisible: {
@@ -35,14 +36,14 @@
 
   const emits = defineEmits(['loadFlow', 'update:testVisible']);
 
-  const flowDataJson = ref<string>('');
+  const flowDataJson = ref<string>();
 
   function onClose() {
     emits('update:testVisible', false);
   }
 
   // 编辑框
-  function editFlowDataJson(e) {
+  function editFlowDataJson(e: ChangeEvent) {
     flowDataJson.value = e.target.value;
   }
 

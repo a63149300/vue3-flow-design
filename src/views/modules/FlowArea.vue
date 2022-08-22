@@ -21,8 +21,6 @@
       class="flow-container"
       :class="{
         grid: flowData.config.showGrid,
-        zoomIn: currentTool.type === 'zoom-in',
-        zoomOut: currentTool.type === 'zoom-out',
         canScale: container.scaleFlag,
         canDrag: container.dragFlag,
         canMultiple: rectangleMultiple.flag,
@@ -86,7 +84,7 @@
   import FlowNode from './FlowNode.vue';
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { CommonNodeType, LaneNodesType } from '/@/type/enums';
-  import { INode, ILink, IElement, IDragInfo } from '/@/type/index';
+  import { INode, ILink, ITool, IDragInfo } from '/@/type/index';
   import { ToolsTypeEnum } from '/@/type/enums';
 
   const props = defineProps({
@@ -111,7 +109,7 @@
       default: () => [],
     },
     currentTool: {
-      type: Object as PropType<IElement>,
+      type: Object as PropType<ITool>,
       default: () => ({}),
     },
     dragInfo: {

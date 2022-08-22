@@ -107,8 +107,8 @@
 <script lang="ts" setup>
   import { ref, unref, watch, onMounted, PropType, reactive } from 'vue';
   import { Resizable } from 'resizable-dom';
-  import { CommonNodeType, HighNodeType, LaneNodesType } from '/@/type/enums';
-  import { INode, ILink, IElement } from '/@/type/index';
+  import { CommonNodeType, HighNodeType, LaneNodesType, ToolsTypeEnum } from '/@/type/enums';
+  import { INode, ILink, ITool } from '/@/type/index';
 
   const props = defineProps({
     select: {
@@ -132,7 +132,7 @@
       default: () => ({}),
     },
     currentTool: {
-      type: Object as PropType<IElement>,
+      type: Object as PropType<ITool>,
       default: () => ({}),
     },
   });
@@ -157,7 +157,7 @@
   let currentSelectGroup = ref(props.selectGroup);
 
   // 设置ICON
-  function setIcon(type: string) {
+  function setIcon(type: CommonNodeType | HighNodeType | LaneNodesType) {
     switch (type) {
       case CommonNodeType.COMMON:
         return 'UserOutlined';
@@ -170,7 +170,7 @@
     }
   }
   // 设置鼠标样式
-  function setCursor(type: string) {
+  function setCursor(type: ToolsTypeEnum) {
     switch (type) {
       case 'drag':
         return 'move';

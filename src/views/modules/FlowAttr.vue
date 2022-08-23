@@ -20,7 +20,7 @@
           节点属性
         </span>
       </template>
-      <template v-if="currentSelect.type === CommonNodeType.START">
+      <template v-if="currentSelect.type === CommonNodeTypeEnum.START">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -37,7 +37,7 @@
           </a-form-item>
         </a-form>
       </template>
-      <template v-if="currentSelect.type === CommonNodeType.END">
+      <template v-if="currentSelect.type === CommonNodeTypeEnum.END">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -54,7 +54,7 @@
           </a-form-item>
         </a-form>
       </template>
-      <template v-if="currentSelect.type === CommonNodeType.COMMON">
+      <template v-if="currentSelect.type === CommonNodeTypeEnum.COMMON">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -71,7 +71,7 @@
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === CommonNodeType.FREEDOM">
+      <template v-else-if="currentSelect.type === CommonNodeTypeEnum.FREEDOM">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -88,7 +88,7 @@
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === CommonNodeType.EVENT">
+      <template v-else-if="currentSelect.type === CommonNodeTypeEnum.EVENT">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -105,7 +105,7 @@
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === CommonNodeType.GATEWAY">
+      <template v-else-if="currentSelect.type === CommonNodeTypeEnum.GATEWAY">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -122,7 +122,7 @@
           </a-form-item>
         </a-form>
       </template>
-      <template v-else-if="currentSelect.type === HighNodeType.CHILD_FLOW">
+      <template v-else-if="currentSelect.type === HighNodeTypeEnum.CHILD_FLOW">
         <a-form layout="vertical">
           <a-form-item label="类型">
             <a-tag color="purple">{{ currentSelect.type }}</a-tag>
@@ -141,7 +141,8 @@
       </template>
       <template
         v-else-if="
-          currentSelect.type === LaneNodesType.X_LANE || currentSelect.type === LaneNodesType.Y_LANE
+          currentSelect.type === LaneNodeTypeEnum.X_LANE ||
+          currentSelect.type === LaneNodeTypeEnum.Y_LANE
         "
       >
         <a-form layout="vertical">
@@ -188,7 +189,7 @@
 
 <script lang="ts" setup>
   import { ref, watch, unref, PropType } from 'vue';
-  import { CommonNodeType, HighNodeType, LaneNodesType } from '/@/type/enums';
+  import { CommonNodeTypeEnum, HighNodeTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
   import { INode, ILink } from '/@/type/index';
 
   const props = defineProps({

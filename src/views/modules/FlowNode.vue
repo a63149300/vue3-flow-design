@@ -1,16 +1,16 @@
 <template>
   <div
     v-if="
-      node.type === CommonNodeType.START ||
-      node.type === CommonNodeType.END ||
-      node.type === CommonNodeType.EVENT
+      node.type === CommonNodeTypeEnum.START ||
+      node.type === CommonNodeTypeEnum.END ||
+      node.type === CommonNodeTypeEnum.EVENT
     "
     :id="node.id"
     class="common-circle-node"
     :class="{
       active: isActive(),
-      isStart: node.type === CommonNodeType.START,
-      isEnd: node.type === CommonNodeType.END,
+      isStart: node.type === CommonNodeTypeEnum.START,
+      isEnd: node.type === CommonNodeTypeEnum.END,
     }"
     :style="{
       top: node.y + 'px',
@@ -25,9 +25,9 @@
 
   <div
     v-else-if="
-      node.type === CommonNodeType.COMMON ||
-      node.type === CommonNodeType.FREEDOM ||
-      node.type === HighNodeType.CHILD_FLOW
+      node.type === CommonNodeTypeEnum.COMMON ||
+      node.type === CommonNodeTypeEnum.FREEDOM ||
+      node.type === HighNodeTypeEnum.CHILD_FLOW
     "
     :id="node.id"
     class="common-rectangle-node"
@@ -45,7 +45,7 @@
   </div>
 
   <div
-    v-else-if="node.type === CommonNodeType.GATEWAY"
+    v-else-if="node.type === CommonNodeTypeEnum.GATEWAY"
     :id="node.id"
     class="common-diamond-node"
     :class="{ active: isActive() }"
@@ -60,7 +60,7 @@
   </div>
 
   <div
-    v-else-if="node.type === LaneNodesType.X_LANE"
+    v-else-if="node.type === LaneNodeTypeEnum.X_LANE"
     :id="node.id"
     class="common-x_lane-node"
     :class="{ active: isActive() }"
@@ -82,7 +82,7 @@
   </div>
 
   <div
-    v-else-if="node.type === LaneNodesType.Y_LANE"
+    v-else-if="node.type === LaneNodeTypeEnum.Y_LANE"
     :id="node.id"
     class="common-y_lane-node"
     :class="{ active: isActive() }"
@@ -107,7 +107,12 @@
 <script lang="ts" setup>
   import { ref, unref, watch, onMounted, PropType, reactive } from 'vue';
   import { Resizable } from 'resizable-dom';
-  import { CommonNodeType, HighNodeType, LaneNodesType, ToolsTypeEnum } from '/@/type/enums';
+  import {
+    CommonNodeTypeEnum,
+    HighNodeTypeEnum,
+    LaneNodeTypeEnum,
+    ToolsTypeEnum,
+  } from '/@/type/enums';
   import { INode, ILink, ITool } from '/@/type/index';
 
   const props = defineProps({
@@ -157,13 +162,13 @@
   let currentSelectGroup = ref(props.selectGroup);
 
   // 设置ICON
-  function setIcon(type: CommonNodeType | HighNodeType | LaneNodesType) {
+  function setIcon(type: CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum) {
     switch (type) {
-      case CommonNodeType.COMMON:
+      case CommonNodeTypeEnum.COMMON:
         return 'UserOutlined';
-      case CommonNodeType.FREEDOM:
+      case CommonNodeTypeEnum.FREEDOM:
         return 'SyncOutlined';
-      case HighNodeType.CHILD_FLOW:
+      case HighNodeTypeEnum.CHILD_FLOW:
         return 'ApartmentOutlined';
       default:
         return 'ToolOutlined';
@@ -215,7 +220,10 @@
       },
     });
 
-    if (currentNode.type === LaneNodesType.X_LANE || currentNode.type === LaneNodesType.Y_LANE) {
+    if (
+      currentNode.type === LaneNodeTypeEnum.X_LANE ||
+      currentNode.type === LaneNodeTypeEnum.Y_LANE
+    ) {
       let node = document.querySelector('#' + currentNode.id) as HTMLElement;
       new Resizable(
         node,

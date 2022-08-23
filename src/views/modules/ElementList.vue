@@ -12,6 +12,7 @@
 <script lang="ts" setup>
   import { PropType } from 'vue';
   import { IElement } from '/@/type/index';
+  import { NodeTypeEnum } from '/@/type/enums';
 
   defineProps({
     nodeList: {
@@ -19,7 +20,7 @@
       default: () => [],
     },
     belongTo: {
-      type: String,
+      type: String as PropType<NodeTypeEnum>,
       default: '',
     },
   });

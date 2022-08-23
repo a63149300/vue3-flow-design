@@ -1,4 +1,4 @@
-import { ToolsTypeEnum, CommonNodeType, HighNodeType, LaneNodesType } from './enums';
+import { ToolsTypeEnum, CommonNodeTypeEnum, HighNodeTypeEnum, LaneNodeTypeEnum } from './enums';
 export interface IDragInfo {
   type: string;
   belongTo: string;
@@ -11,7 +11,7 @@ export interface ITool {
 }
 
 export interface IElement {
-  type: CommonNodeType | HighNodeType | LaneNodesType;
+  type: CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum;
   nodeName: string;
   icon: string;
 }

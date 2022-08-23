@@ -83,7 +83,7 @@
   import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';
   import { useContextMenu } from '/@/hooks/useContextMenu';
-  import { CommonNodeType, LaneNodesType } from '/@/type/enums';
+  import { CommonNodeTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
   import { INode, ILink, ITool, IDragInfo } from '/@/type/index';
   import { ToolsTypeEnum } from '/@/type/enums';
 
@@ -311,10 +311,10 @@
     newNode.id = newNode.type + '-' + utils.getId();
     newNode.height = 50;
     if (
-      newNode.type === CommonNodeType.START ||
-      newNode.type === CommonNodeType.END ||
-      newNode.type === CommonNodeType.EVENT ||
-      newNode.type === CommonNodeType.GATEWAY
+      newNode.type === CommonNodeTypeEnum.START ||
+      newNode.type === CommonNodeTypeEnum.END ||
+      newNode.type === CommonNodeTypeEnum.EVENT ||
+      newNode.type === CommonNodeTypeEnum.GATEWAY
     ) {
       newNode.x = x - 25;
       newNode.width = 50;
@@ -323,10 +323,10 @@
       newNode.width = 120;
     }
     newNode.y = y - 25;
-    if (newNode.type === LaneNodesType.X_LANE) {
+    if (newNode.type === LaneNodeTypeEnum.X_LANE) {
       newNode.height = 200;
       newNode.width = 500;
-    } else if (newNode.type === LaneNodesType.Y_LANE) {
+    } else if (newNode.type === LaneNodeTypeEnum.Y_LANE) {
       newNode.height = 500;
       newNode.width = 200;
     }

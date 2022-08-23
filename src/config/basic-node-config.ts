@@ -1,7 +1,12 @@
-import { ToolsTypeEnum, CommonNodeType, HighNodeType, LaneNodesType } from '/@/type/enums';
-import { IElement } from '/@/type/index';
+import {
+  ToolsTypeEnum,
+  CommonNodeTypeEnum,
+  HighNodeTypeEnum,
+  LaneNodeTypeEnum,
+} from '/@/type/enums';
+import { IElement, ITool } from '/@/type/index';
 
-export const tools: IElement[] = [
+export const tools: ITool[] = [
   {
     type: ToolsTypeEnum.DRAG,
     nodeName: '拖拽',
@@ -16,32 +21,32 @@ export const tools: IElement[] = [
 
 export const commonNodes: IElement[] = [
   {
-    type: CommonNodeType.START,
+    type: CommonNodeTypeEnum.START,
     nodeName: '开始',
     icon: 'PlayCircleOutlined',
   },
   {
-    type: CommonNodeType.COMMON,
+    type: CommonNodeTypeEnum.COMMON,
     nodeName: '人工节点',
     icon: 'UserOutlined',
   },
   {
-    type: CommonNodeType.FREEDOM,
+    type: CommonNodeTypeEnum.FREEDOM,
     nodeName: '自动节点',
     icon: 'SyncOutlined',
   },
   {
-    type: CommonNodeType.GATEWAY,
+    type: CommonNodeTypeEnum.GATEWAY,
     nodeName: '网关',
     icon: 'GatewayOutlined',
   },
   {
-    type: CommonNodeType.EVENT,
+    type: CommonNodeTypeEnum.EVENT,
     nodeName: '事件',
     icon: 'SelectOutlined',
   },
   {
-    type: CommonNodeType.END,
+    type: CommonNodeTypeEnum.END,
     nodeName: '结束',
     icon: 'StopOutlined',
   },
@@ -49,7 +54,7 @@ export const commonNodes: IElement[] = [
 
 export const highNodes: IElement[] = [
   {
-    type: HighNodeType.CHILD_FLOW,
+    type: HighNodeTypeEnum.CHILD_FLOW,
     nodeName: '子流程',
     icon: 'ApartmentOutlined',
   },
@@ -57,12 +62,12 @@ export const highNodes: IElement[] = [
 
 export const laneNodes: IElement[] = [
   {
-    type: LaneNodesType.X_LANE,
+    type: LaneNodeTypeEnum.X_LANE,
     nodeName: '横向泳道',
     icon: 'ColumnWidthOutlined',
   },
   {
-    type: LaneNodesType.Y_LANE,
+    type: LaneNodeTypeEnum.Y_LANE,
     nodeName: '纵向泳道',
     icon: 'ColumnHeightOutlined',
   },

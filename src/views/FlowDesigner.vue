@@ -6,7 +6,7 @@
           <div class="tab">基础</div>
           <element-list
             :nodeList="field.commonNodes"
-            belongTo="commonNodes"
+            :belongTo="NodeTypeEnum.Common_Node_Type"
             @setDragInfo="setDragInfo"
           />
         </a-row>
@@ -14,7 +14,7 @@
           <div class="tab">高级</div>
           <element-list
             :nodeList="field.highNodes"
-            belongTo="highNodes"
+            :belongTo="NodeTypeEnum.High_Node_Type"
             @setDragInfo="setDragInfo"
           />
         </a-row>
@@ -22,7 +22,7 @@
           <div class="tab">泳道</div>
           <element-list
             :nodeList="field.laneNodes"
-            belongTo="laneNodes"
+            :belongTo="NodeTypeEnum.Lane_Node_Type"
             @setDragInfo="setDragInfo"
           />
         </a-row>
@@ -179,8 +179,8 @@
   import TestModal from './modules/TestModal.vue';
   import { tools, commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
   import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
-  import { IDragInfo, IElement, INode, ILink } from '/@/type/index';
-  import { ToolsTypeEnum, LaneNodesType } from '/@/type/enums';
+  import { IDragInfo, IElement, INode, ILink, ITool } from '/@/type/index';
+  import { ToolsTypeEnum, LaneNodeTypeEnum, NodeTypeEnum } from '/@/type/enums';
   import { utils } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
 
@@ -196,7 +196,7 @@
     laneNodes: laneNodes,
   });
 
-  const currentTool = ref<IElement>(tools[0]);
+  const currentTool = ref<ITool>(tools[0]);
 
   const flowAreaRef = ref();
 
@@ -441,7 +441,7 @@
       if (!f) {
         plumb.value.toggleDraggable(node.id);
       }
-      if (node.type !== LaneNodesType.X_LANE && node.type !== LaneNodesType.Y_LANE) {
+      if (node.type !== LaneNodeTypeEnum.X_LANE && node.type !== LaneNodeTypeEnum.Y_LANE) {
         plumb.value.unmakeSource(node.id);
         plumb.value.unmakeTarget(node.id);
       }
@@ -455,7 +455,7 @@
       if (f) {
         plumb.value.toggleDraggable(node.id);
       }
-      if (node.type !== LaneNodesType.X_LANE && node.type !== LaneNodesType.Y_LANE) {
+      if (node.type !== LaneNodeTypeEnum.X_LANE && node.type !== LaneNodeTypeEnum.Y_LANE) {
         plumb.value.makeSource(node.id, flowConfig.jsPlumbConfig.makeSourceConfig);
         plumb.value.makeTarget(node.id, flowConfig.jsPlumbConfig.makeTargetConfig);
       }
@@ -631,13 +631,13 @@
   function findNodeConfig(belongTo, type, callback) {
     let node: IElement | undefined;
     switch (belongTo) {
-      case 'commonNodes':
+      case NodeTypeEnum.Common_Node_Type:
         node = commonNodes.find((n) => n.type === type);
         break;
-      case 'highNodes':
+      case NodeTypeEnum.High_Node_Type:
         node = highNodes.find((n) => n.type === type);
         break;
-      case 'laneNodes':
+      case NodeTypeEnum.Lane_Node_Type:
         node = laneNodes.find((n) => n.type === type);
         break;
       default:

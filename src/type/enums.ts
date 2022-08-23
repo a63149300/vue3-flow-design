@@ -3,7 +3,13 @@ export enum ToolsTypeEnum {
   CONNECTION = 'connection',
 }
 
-export enum CommonNodeType {
+export enum NodeTypeEnum {
+  Common_Node_Type = 'CommonNodeType',
+  High_Node_Type = 'HighNodeType',
+  Lane_Node_Type = 'LaneNodeType',
+}
+
+export enum CommonNodeTypeEnum {
   START = 'start',
   COMMON = 'common',
   FREEDOM = 'freedom',
@@ -12,11 +18,11 @@ export enum CommonNodeType {
   END = 'end',
 }
 
-export enum HighNodeType {
+export enum HighNodeTypeEnum {
   CHILD_FLOW = 'child_flow',
 }
 
-export enum LaneNodesType {
+export enum LaneNodeTypeEnum {
   X_LANE = 'x_lane',
   Y_LANE = 'y_lane',
 }

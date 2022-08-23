@@ -234,8 +234,8 @@
   });
 
   const dragInfo = reactive<IDragInfo>({
-    type: '',
-    belongTo: '',
+    type: null,
+    belongTo: null,
   });
 
   // 初始化流程图

@@ -1,7 +1,14 @@
-import { ToolsTypeEnum, CommonNodeTypeEnum, HighNodeTypeEnum, LaneNodeTypeEnum } from './enums';
+import {
+  ToolsTypeEnum,
+  NodeTypeEnum,
+  CommonNodeTypeEnum,
+  HighNodeTypeEnum,
+  LaneNodeTypeEnum,
+} from './enums';
+
 export interface IDragInfo {
-  type: string;
-  belongTo: string;
+  type: Nullable<CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum>;
+  belongTo: Nullable<NodeTypeEnum>;
 }
 
 export interface ITool {

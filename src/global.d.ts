@@ -10,3 +10,7 @@ declare module 'vue' {
     | { new (): ComponentPublicInstance<Props> }
     | FunctionalComponent<Props>;
 }
+
+declare interface Fn<T = any, R = T> {
+  (...arg: T[]): R;
+}

@@ -1,146 +1,120 @@
 <template>
-  <div style="height: 100%">
-    <a-layout class="container">
-      <a-layout-sider width="44" class="select-area">
-        <a-row>
-          <div class="tab">基础</div>
-          <element-list
-            :nodeList="field.commonNodes"
-            :belongTo="NodeTypeEnum.Common_Node_Type"
-            @setDragInfo="setDragInfo"
-          />
-        </a-row>
-        <a-row>
-          <div class="tab">高级</div>
-          <element-list
-            :nodeList="field.highNodes"
-            :belongTo="NodeTypeEnum.High_Node_Type"
-            @setDragInfo="setDragInfo"
-          />
-        </a-row>
-        <a-row>
-          <div class="tab">泳道</div>
-          <element-list
-            :nodeList="field.laneNodes"
-            :belongTo="NodeTypeEnum.Lane_Node_Type"
-            @setDragInfo="setDragInfo"
-          />
-        </a-row>
-      </a-layout-sider>
-      <a-layout>
-        <a-layout-header class="header-option">
-          <!-- 操作区 -->
-          <div class="header-option__tools">
-            <span v-for="tool in field.tools" :key="tool.type">
-              <a-tooltip :title="tool.nodeName" placement="right">
-                <a-button
-                  size="small"
-                  :type="currentTool.type === tool.type ? 'primary' : 'default'"
-                  @click="selectTool(tool.type)"
-                >
-                  <template #icon>
-                    <component :is="tool.icon" />
-                  </template>
-                </a-button>
-              </a-tooltip>
-            </span>
-          </div>
-          <!-- 工具区 -->
-          <div class="header-option__buttons">
-            <a-tooltip title="生成流程图片" placement="bottom">
-              <a-button @click="exportFlowPicture" class="header-option-button" size="small">
+  <a-layout class="flow-wrapper">
+    <flow-element @setDragInfo="setDragInfo" />
+    <a-layout>
+      <a-layout-header class="header-option">
+        <!-- 操作区 -->
+        <div class="header-option__tools">
+          <span v-for="tool in field.tools" :key="tool.type">
+            <a-tooltip :title="tool.nodeName" placement="right">
+              <a-button
+                size="small"
+                :type="currentTool.type === tool.type ? 'primary' : 'default'"
+                @click="selectTool(tool.type)"
+              >
                 <template #icon>
-                  <component :is="'PictureOutlined'" />
+                  <component :is="tool.icon" />
                 </template>
               </a-button>
             </a-tooltip>
-
-            <a-popconfirm
-              title="确认要重新绘制吗？"
-              placement="bottom"
-              okText="确认"
-              cancelText="取消"
-              @confirm="clear"
-            >
-              <a-tooltip title="重新绘制" placement="bottom">
-                <a-button class="header-option-button" size="small">
-                  <template #icon>
-                    <component :is="'DeleteOutlined'" />
-                  </template>
-                </a-button>
-              </a-tooltip>
-            </a-popconfirm>
-
-            <a-tooltip :title="flowData.config.showGridText" placement="bottom">
-              <a-button @click="toggleShowGrid" class="header-option-button" size="small">
-                <component :is="flowData.config.showGridIcon" />
-              </a-button>
-            </a-tooltip>
-
-            <a-tooltip title="设置" placement="bottom">
-              <a-button @click="setting" class="header-option-button" size="small">
-                <template #icon>
-                  <component :is="'SettingOutlined'" />
-                </template>
-              </a-button>
-            </a-tooltip>
-
-            <a-tooltip title="测试" placement="bottom">
-              <a-button @click="openTest" class="header-option-button" size="small">
-                <template #icon>
-                  <component :is="'ToolOutlined'" />
-                </template>
-              </a-button>
-            </a-tooltip>
-
-            <a-tooltip title="快捷键大全" placement="bottom">
-              <a-button @click="shortcutHelper" class="header-option-button" size="small">
-                <template #icon>
-                  <component :is="'BookOutlined'" />
-                </template>
-              </a-button>
-            </a-tooltip>
-
-            <a-tooltip title="保存流程" placement="bottom">
-              <a-button @click="saveFlow" class="header-option-button" size="small">
-                <template #icon>
-                  <component :is="'SaveOutlined'" />
-                </template>
-              </a-button>
-            </a-tooltip>
-          </div>
-        </a-layout-header>
-        <a-layout-content class="content">
-          <flow-area
-            ref="flowAreaRef"
-            :dragInfo="dragInfo"
-            v-model:data="flowData"
-            :config="flowConfig"
-            v-model:select="currentSelect"
-            v-model:selectGroup="currentSelectGroup"
-            :plumb="plumb"
-            :currentTool="currentTool"
-            @findNodeConfig="findNodeConfig"
-            @selectTool="selectTool"
-            @getShortcut="getShortcut"
-            @saveFlow="saveFlow"
-          />
-        </a-layout-content>
-        <a-layout-footer class="foot">
-          <span>Vue3-Flow-Design, Powered by 前端爱码士</span>
-          <a-tooltip title="GIT地址" placement="top">
-            <a-button @click="goGit" type="link" size="small">
+          </span>
+        </div>
+        <!-- 工具区 -->
+        <div class="header-option__buttons">
+          <a-tooltip title="生成流程图片" placement="bottom">
+            <a-button @click="exportFlowPicture" class="header-option-button" size="small">
               <template #icon>
-                <component :is="'GithubOutlined'" />
+                <component :is="'PictureOutlined'" />
               </template>
             </a-button>
           </a-tooltip>
-        </a-layout-footer>
-      </a-layout>
-      <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
-        <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
-      </a-layout-sider>
+
+          <a-popconfirm
+            title="确认要重新绘制吗？"
+            placement="bottom"
+            okText="确认"
+            cancelText="取消"
+            @confirm="clear"
+          >
+            <a-tooltip title="重新绘制" placement="bottom">
+              <a-button class="header-option-button" size="small">
+                <template #icon>
+                  <component :is="'DeleteOutlined'" />
+                </template>
+              </a-button>
+            </a-tooltip>
+          </a-popconfirm>
+
+          <a-tooltip :title="flowData.config.showGridText" placement="bottom">
+            <a-button @click="toggleShowGrid" class="header-option-button" size="small">
+              <component :is="flowData.config.showGridIcon" />
+            </a-button>
+          </a-tooltip>
+
+          <a-tooltip title="设置" placement="bottom">
+            <a-button @click="setting" class="header-option-button" size="small">
+              <template #icon>
+                <component :is="'SettingOutlined'" />
+              </template>
+            </a-button>
+          </a-tooltip>
+
+          <a-tooltip title="测试" placement="bottom">
+            <a-button @click="openTest" class="header-option-button" size="small">
+              <template #icon>
+                <component :is="'ToolOutlined'" />
+              </template>
+            </a-button>
+          </a-tooltip>
+
+          <a-tooltip title="快捷键大全" placement="bottom">
+            <a-button @click="shortcutHelper" class="header-option-button" size="small">
+              <template #icon>
+                <component :is="'BookOutlined'" />
+              </template>
+            </a-button>
+          </a-tooltip>
+
+          <a-tooltip title="保存流程" placement="bottom">
+            <a-button @click="saveFlow" class="header-option-button" size="small">
+              <template #icon>
+                <component :is="'SaveOutlined'" />
+              </template>
+            </a-button>
+          </a-tooltip>
+        </div>
+      </a-layout-header>
+      <a-layout-content class="content">
+        <flow-area
+          ref="flowAreaRef"
+          :dragInfo="dragInfo"
+          v-model:data="flowData"
+          :config="flowConfig"
+          v-model:select="currentSelect"
+          v-model:selectGroup="currentSelectGroup"
+          :plumb="plumb"
+          :currentTool="currentTool"
+          @findNodeConfig="findNodeConfig"
+          @selectTool="selectTool"
+          @getShortcut="getShortcut"
+          @saveFlow="saveFlow"
+        />
+      </a-layout-content>
+      <a-layout-footer class="foot">
+        <span>Vue3-Flow-Design, Powered by 前端爱码士</span>
+        <a-tooltip title="GIT地址" placement="top">
+          <a-button @click="goGit" type="link" size="small">
+            <template #icon>
+              <component :is="'GithubOutlined'" />
+            </template>
+          </a-button>
+        </a-tooltip>
+      </a-layout-footer>
     </a-layout>
+    <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
+      <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
+    </a-layout-sider>
+
     <!-- 生成流程图片 -->
     <a-modal
       :title="'流程设计图_' + flowData.attr.id + '.png'"
@@ -162,7 +136,7 @@
     <ShortcutModal ref="shortcutModalRef" />
     <!-- 测试 -->
     <TestModal v-model:testVisible="testVisible" :flowData="flowData" @loadFlow="loadFlow" />
-  </div>
+  </a-layout>
 </template>
 
 <script lang="ts" setup>
@@ -171,18 +145,19 @@
   import { message } from 'ant-design-vue';
   import canvg from 'canvg';
   import html2canvas from 'html2canvas';
-  import ElementList from './modules/ElementList.vue';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
   import SettingModal from './modules/SettingModal.vue';
   import ShortcutModal from './modules/ShortcutModal.vue';
   import TestModal from './modules/TestModal.vue';
-  import { tools, commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
+  import FlowElement from './modules/FlowElement.vue';
+  import { tools } from '/@/config/basic-node-config';
   import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
   import { IDragInfo, IElement, INode, ILink, ITool } from '/@/type/index';
-  import { ToolsTypeEnum, LaneNodeTypeEnum, NodeTypeEnum } from '/@/type/enums';
+  import { ToolsTypeEnum, LaneNodeTypeEnum, NodeTypeEnum, CommonNodeTypeEnum } from '/@/type/enums';
   import { utils } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
+  import { commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
 
   const [createContextMenu] = useContextMenu();
 
@@ -191,9 +166,6 @@
   const plumb = ref<any>({});
   const field = reactive({
     tools: tools,
-    commonNodes: commonNodes,
-    highNodes: highNodes,
-    laneNodes: laneNodes,
   });
 
   const currentTool = ref<ITool>(tools[0]);
@@ -628,7 +600,7 @@
   }
 
   // 查找相关节点
-  function findNodeConfig(belongTo, type, callback) {
+  function findNodeConfig(belongTo: NodeTypeEnum, type: CommonNodeTypeEnum, callback: Fn) {
     let node: IElement | undefined;
     switch (belongTo) {
       case NodeTypeEnum.Common_Node_Type:

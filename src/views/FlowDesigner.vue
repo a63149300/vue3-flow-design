@@ -31,16 +31,8 @@
           @saveFlow="saveFlow"
         />
       </a-layout-content>
-      <a-layout-footer class="flow-footer">
-        <span>Vue3-Flow-Design, Powered by 前端爱码士</span>
-        <a-tooltip title="GIT地址" placement="top">
-          <a-button @click="goGit" type="link" size="small">
-            <template #icon>
-              <component :is="'GithubOutlined'" />
-            </template>
-          </a-button>
-        </a-tooltip>
-      </a-layout-footer>
+      <!-- 底部 -->
+      <flow-footer />
     </a-layout>
     <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
       <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
@@ -83,6 +75,7 @@
   import TestModal from './modules/TestModal.vue';
   import FlowElement from './modules/FlowElement.vue';
   import Toolbar from './modules/Toolbar.vue';
+  import FlowFooter from './modules/FlowFooter.vue';
   import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
   import { tools } from '/@/config/basic-node-config';
   import { IDragInfo, IElement, INode, ILink, ITool } from '/@/type/index';
@@ -487,10 +480,10 @@
           flowAreaRef.value.container.dragFlag = true;
           break;
         case flowConfig.shortcut.dragTool.code:
-          selectTool('drag');
+          selectTool(ToolsTypeEnum.DRAG);
           break;
         case flowConfig.shortcut.connTool.code:
-          selectTool('connection');
+          selectTool(ToolsTypeEnum.CONNECTION);
           break;
         case flowConfig.shortcut.leftMove.code:
           moveNode('left');
@@ -585,11 +578,6 @@
   // 快捷键大全
   function shortcutHelper() {
     shortcutModalRef.value.open();
-  }
-
-  // GIT地址
-  function goGit() {
-    window.open('https://gitee.com/zhangyeping/vue3-flow-design');
   }
 
   // 生成流程图片

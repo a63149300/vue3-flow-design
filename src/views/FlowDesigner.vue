@@ -15,7 +15,7 @@
         @shortcutHelper="shortcutHelper"
         @saveFlow="saveFlow"
       />
-      <a-layout-content class="content">
+      <a-layout-content class="flow-content">
         <flow-area
           ref="flowAreaRef"
           :dragInfo="dragInfo"

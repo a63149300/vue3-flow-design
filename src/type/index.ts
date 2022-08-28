@@ -6,8 +6,10 @@ import {
   LaneNodeTypeEnum,
 } from './enums';
 
+export type NodesType = CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum;
+
 export interface IDragInfo {
-  type: Nullable<CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum>;
+  type: Nullable<NodesType>;
   belongTo: Nullable<NodeTypeEnum>;
 }
 
@@ -18,7 +20,7 @@ export interface ITool {
 }
 
 export interface IElement {
-  type: CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum;
+  type: NodesType;
   nodeName: string;
   icon: string;
 }

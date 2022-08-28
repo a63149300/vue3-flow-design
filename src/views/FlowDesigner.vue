@@ -1,5 +1,6 @@
 <template>
   <a-layout class="flow-wrapper">
+    <!-- 左侧边组件元素 -->
     <flow-element @setDragInfo="setDragInfo" />
     <a-layout>
       <!-- 工具区 -->
@@ -15,6 +16,7 @@
         @shortcutHelper="shortcutHelper"
         @saveFlow="saveFlow"
       />
+      <!-- 画布区 -->
       <a-layout-content class="flow-content">
         <flow-area
           ref="flowAreaRef"
@@ -25,7 +27,6 @@
           v-model:selectGroup="currentSelectGroup"
           :plumb="plumb"
           :currentTool="currentTool"
-          @findNodeConfig="findNodeConfig"
           @selectTool="selectTool"
           @getShortcut="getShortcut"
           @saveFlow="saveFlow"
@@ -35,6 +36,7 @@
       <flow-footer />
     </a-layout>
     <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
+      <!-- 组件属性区 -->
       <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
     </a-layout-sider>
 
@@ -76,30 +78,37 @@
   import FlowElement from './modules/FlowElement.vue';
   import Toolbar from './modules/Toolbar.vue';
   import FlowFooter from './modules/FlowFooter.vue';
-  import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
   import { tools } from '/@/config/basic-node-config';
-  import { IDragInfo, IElement, INode, ILink, ITool } from '/@/type/index';
-  import { ToolsTypeEnum, LaneNodeTypeEnum, NodeTypeEnum, CommonNodeTypeEnum } from '/@/type/enums';
+  import { IDragInfo, INode, ILink, ITool } from '/@/type/index';
+  import { ToolsTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
   import { utils } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
-  import { commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
+  import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
 
   const [createContextMenu] = useContextMenu();
 
+  // 流程配置
   const flowConfig = reactive(defaultFlowConfig);
 
-  const plumb = ref<any>({});
+  // 流程实例
+  const plumb = ref();
 
+  // 当前工具类型
   const currentTool = ref<ITool>(tools[0]);
 
+  // 画布Ref
   const flowAreaRef = ref();
 
+  // 设置Ref
   const settingModalRef = ref();
 
+  // 快捷键大全Ref
   const shortcutModalRef = ref();
 
+  // 测试弹窗显隐
   const testVisible = ref<boolean>(false);
 
+  // 流程DSL
   const flowData = reactive<Recordable>({
     nodeList: [],
     linkList: [],
@@ -113,13 +122,17 @@
     },
     status: flowConfig.flowStatus.CREATE,
   });
+
   // 当前选择节点
   const currentSelect = ref<INode | ILink>();
+
   // 当前选择组
   const currentSelectGroup = ref<INode[]>([]);
+
   // 画布聚焦开启快捷键
   let activeShortcut = true;
 
+  // 生成流程图片
   const flowPicture = reactive({
     url: '',
     modalVisible: false,
@@ -519,25 +532,6 @@
         flowAreaRef.value.rectangleMultiple.flag = false;
       }
     };
-  }
-
-  // 查找相关节点
-  function findNodeConfig(belongTo: NodeTypeEnum, type: CommonNodeTypeEnum, callback: Fn) {
-    let node: IElement | undefined;
-    switch (belongTo) {
-      case NodeTypeEnum.Common_Node_Type:
-        node = commonNodes.find((n) => n.type === type);
-        break;
-      case NodeTypeEnum.High_Node_Type:
-        node = highNodes.find((n) => n.type === type);
-        break;
-      case NodeTypeEnum.Lane_Node_Type:
-        node = laneNodes.find((n) => n.type === type);
-        break;
-      default:
-        node = undefined;
-    }
-    callback(node);
   }
 
   // 清除画布

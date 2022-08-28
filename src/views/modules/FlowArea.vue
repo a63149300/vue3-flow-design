@@ -83,9 +83,9 @@
   import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';
   import { useContextMenu } from '/@/hooks/useContextMenu';
-  import { CommonNodeTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
-  import { INode, ILink, ITool, IDragInfo } from '/@/type/index';
-  import { ToolsTypeEnum } from '/@/type/enums';
+  import { CommonNodeTypeEnum, LaneNodeTypeEnum, ToolsTypeEnum, NodeTypeEnum } from '/@/type/enums';
+  import { INode, ILink, ITool, IDragInfo, IElement } from '/@/type/index';
+  import { commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
 
   const props = defineProps({
     data: {
@@ -125,7 +125,6 @@
   const flowData = ref(props.data);
 
   const emits = defineEmits([
-    'findNodeConfig',
     'selectTool',
     'getShortcut',
     'saveFlow',
@@ -213,21 +212,40 @@
     mousemoveHandler(e);
   }
 
-  function drop() {
-    let belongTo = props.dragInfo.belongTo;
-    let type = props.dragInfo.type;
+  // 查找相关节点
+  function findNodeConfig(dragInfo: IDragInfo) {
+    let node: IElement | undefined;
+    const { belongTo, type } = dragInfo;
 
+    switch (belongTo) {
+      case NodeTypeEnum.Common_Node_Type:
+        node = commonNodes.find((n) => n.type === type);
+        break;
+      case NodeTypeEnum.High_Node_Type:
+        node = highNodes.find((n) => n.type === type);
+        break;
+      case NodeTypeEnum.Lane_Node_Type:
+        node = laneNodes.find((n) => n.type === type);
+        break;
+      default:
+        node = undefined;
+    }
+
+    if (!node) {
+      message.error('未知的节点类型！');
+      return;
+    }
+
+    // 增加节点
+    addNewNode(node);
+  }
+
+  // 组件拖拽入画布
+  function drop() {
     // 复位拖拽工具
     emits('selectTool', ToolsTypeEnum.DRAG);
 
-    emits('findNodeConfig', belongTo, type, (node) => {
-      if (!node) {
-        message.error('未知的节点类型！');
-        return;
-      }
-      // 增加节点
-      addNewNode(node);
-    });
+    findNodeConfig(props.dragInfo);
   }
 
   // 画布鼠标移动

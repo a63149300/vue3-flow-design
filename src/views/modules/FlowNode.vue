@@ -113,7 +113,7 @@
     LaneNodeTypeEnum,
     ToolsTypeEnum,
   } from '/@/type/enums';
-  import { INode, ILink, ITool } from '/@/type/index';
+  import { INode, ILink, ITool, NodesType } from '/@/type/index';
 
   const props = defineProps({
     select: {
@@ -162,7 +162,7 @@
   let currentSelectGroup = ref(props.selectGroup);
 
   // 设置ICON
-  function setIcon(type: CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum) {
+  function setIcon(type: NodesType) {
     switch (type) {
       case CommonNodeTypeEnum.COMMON:
         return 'UserOutlined';

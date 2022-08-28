@@ -140,6 +140,7 @@
     maskClosable: false,
   });
 
+  // 拖拽组件元素信息
   const dragInfo = reactive<IDragInfo>({
     type: null,
     belongTo: null,
@@ -158,20 +159,16 @@
   async function loadFlow(str = '') {
     clear();
     await nextTick();
-    let loadData = JSON.parse(str);
+    const loadData = JSON.parse(str);
     flowData.attr = loadData.attr;
     flowData.config = loadData.config;
     flowData.status = flowConfig.flowStatus.LOADING;
-    plumb.value.batch(async () => {
-      let nodeList = loadData.nodeList;
-      nodeList.forEach((node: Recordable) => {
-        flowData.nodeList.push(node);
-      });
+    unref(plumb).batch(async () => {
+      flowData.nodeList = loadData.nodeList;
       let linkList = loadData.linkList;
-      await nextTick();
-      linkList.forEach((link) => {
-        flowData.linkList.push(link);
-        let conn = plumb.value.connect({
+      flowData.linkList = linkList;
+      linkList.forEach((link: ILink) => {
+        let conn = unref(plumb).connect({
           source: link.sourceId,
           target: link.targetId,
           anchor: flowConfig.jsPlumbConfig.anchor.default,
@@ -189,10 +186,10 @@
           },
         });
         let link_id = conn.canvas.id;
-        let labelHandle = (e) => {
-          let event = window.event || e;
-          event.stopPropagation();
-          currentSelect.value = flowData.linkList.filter((l: Recordable) => l.id === link_id)[0];
+        let link_dom = document.querySelector('.' + link_id);
+        let labelHandle = (e: Event) => {
+          e.stopPropagation();
+          currentSelect.value = flowData.linkList.find((l: ILink) => l.id === link_id);
         };
 
         if (link.label !== '') {
@@ -202,18 +199,17 @@
           });
 
           // 添加label点击事件
-          document.querySelector('.' + link_id)?.addEventListener('click', labelHandle);
+          link_dom?.addEventListener('click', labelHandle);
         } else {
-          if (document.querySelector('.' + link_id)) {
-            // 移除label点击事件
-            document.querySelector('.' + link_id)?.removeEventListener('click', labelHandle);
-          }
+          // 移除label点击事件
+          link_dom?.removeEventListener('click', labelHandle);
         }
       });
       currentSelect.value = undefined;
       currentSelectGroup.value = [];
       flowData.status = flowConfig.flowStatus.MODIFY;
     }, true);
+
     flowAreaRef.value.container.pos = {
       top: 0,
       left: 0,
@@ -227,7 +223,7 @@
       minY = nodeList[0].y,
       maxX = nodeList[0].x + nodeList[0].width,
       maxY = nodeList[0].y + nodeList[0].height;
-    nodeList.forEach((node) => {
+    nodeList.forEach((node: INode) => {
       minX = Math.min(minX, node.x);
       minY = Math.min(minY, node.y);
       maxX = Math.max(maxX, node.x + node.width);
@@ -249,22 +245,22 @@
   function initJsPlumb() {
     plumb.value = jsPlumb.getInstance(flowConfig.jsPlumbInsConfig as unknown as Defaults);
 
-    plumb.value.bind('beforeDrop', (info) => {
+    unref(plumb).bind('beforeDrop', (info: Recordable) => {
       let sourceId = info.sourceId;
       let targetId = info.targetId;
 
       if (sourceId === targetId) return false;
-      let filter = flowData.linkList.filter(
-        (link: Recordable) => link.sourceId === sourceId && link.targetId === targetId,
+      let notOnlyLink = flowData.linkList.find(
+        (link: ILink) => link.sourceId === sourceId && link.targetId === targetId,
       );
-      if (filter.length > 0) {
+      if (notOnlyLink) {
         message.error('同方向的两节点连线只能有一条！');
         return false;
       }
       return true;
     });
 
-    plumb.value.bind('connection', (conn: Recordable) => {
+    unref(plumb).bind('connection', (conn: Recordable) => {
       let connObj = conn.connection.canvas;
       let o: Recordable = {};
       let id = '';
@@ -291,21 +287,20 @@
         linkColor: flowConfig.jsPlumbInsConfig.PaintStyle.stroke,
         linkThickness: flowConfig.jsPlumbInsConfig.PaintStyle.strokeWidth,
       };
-      document.querySelector('#' + id)?.addEventListener('contextmenu', (e) => {
+      document.querySelector('#' + id)?.addEventListener('contextmenu', (e: Event) => {
         showLinkContextMenu(e);
-        currentSelect.value = flowData.linkList.find((l: Recordable) => l.id === id);
+        currentSelect.value = flowData.linkList.find((l: ILink) => l.id === id);
       });
 
-      document.querySelector('#' + id)?.addEventListener('click', (e) => {
-        let event = window.event || e;
-        event.stopPropagation();
+      document.querySelector('#' + id)?.addEventListener('click', (e: Event) => {
+        e.stopPropagation();
         currentSelect.value = flowData.linkList.find((l: Recordable) => l.id === id);
       });
 
       if (flowData.status !== flowConfig.flowStatus.LOADING) flowData.linkList.push(o);
     });
 
-    plumb.value.importDefaults({
+    unref(plumb).importDefaults({
       ConnectionsDetachable: flowConfig.jsPlumbConfig.conn.isDetachable,
     });
   }
@@ -343,28 +338,28 @@
 
   // 切换为拖拽
   function changeToDrag() {
-    flowData.nodeList.forEach((node: Recordable) => {
-      let f = plumb.value.toggleDraggable(node.id);
+    flowData.nodeList.forEach((node: INode) => {
+      let f = unref(plumb).toggleDraggable(node.id);
       if (!f) {
-        plumb.value.toggleDraggable(node.id);
+        unref(plumb).toggleDraggable(node.id);
       }
       if (node.type !== LaneNodeTypeEnum.X_LANE && node.type !== LaneNodeTypeEnum.Y_LANE) {
-        plumb.value.unmakeSource(node.id);
-        plumb.value.unmakeTarget(node.id);
+        unref(plumb).unmakeSource(node.id);
+        unref(plumb).unmakeTarget(node.id);
       }
     });
   }
 
   // 切换为连线
   function changeToConnection() {
-    flowData.nodeList.forEach((node: Recordable) => {
-      let f = plumb.value.toggleDraggable(node.id);
+    flowData.nodeList.forEach((node: INode) => {
+      let f = unref(plumb).toggleDraggable(node.id);
       if (f) {
-        plumb.value.toggleDraggable(node.id);
+        unref(plumb).toggleDraggable(node.id);
       }
       if (node.type !== LaneNodeTypeEnum.X_LANE && node.type !== LaneNodeTypeEnum.Y_LANE) {
-        plumb.value.makeSource(node.id, flowConfig.jsPlumbConfig.makeSourceConfig);
-        plumb.value.makeTarget(node.id, flowConfig.jsPlumbConfig.makeTargetConfig);
+        unref(plumb).makeSource(node.id, flowConfig.jsPlumbConfig.makeSourceConfig);
+        unref(plumb).makeTarget(node.id, flowConfig.jsPlumbConfig.makeTargetConfig);
       }
     });
 
@@ -411,8 +406,7 @@
 
   // 关闭提示
   function listenPage() {
-    window.onbeforeunload = function (e) {
-      e = e || window.event;
+    window.onbeforeunload = function (e: BeforeUnloadEvent) {
       if (e) {
         e.returnValue = '关闭提示';
       }
@@ -424,17 +418,15 @@
   function deleteLink() {
     let sourceId = (unref(currentSelect) as ILink)?.sourceId;
     let targetId = (unref(currentSelect) as ILink)?.targetId;
-    plumb.value.deleteConnection(
-      plumb.value.getConnections({
+    unref(plumb).deleteConnection(
+      unref(plumb).getConnections({
         source: sourceId,
         target: targetId,
       })[0],
     );
     let linkList = flowData.linkList;
     linkList.splice(
-      linkList.findIndex(
-        (link: Recordable) => link.sourceId === sourceId && link.targetId === targetId,
-      ),
+      linkList.findIndex((link: ILink) => link.sourceId === sourceId && link.targetId === targetId),
       1,
     );
     currentSelect.value = undefined;
@@ -466,14 +458,14 @@
           node.y += m;
         }
       });
-      plumb.value.repaintEverything();
+      unref(plumb).repaintEverything();
     } else if (unref(currentSelect)?.id) {
       if (isX) {
         (currentSelect.value as INode)!.x += m;
       } else {
         (currentSelect.value as INode)!.y += m;
       }
-      plumb.value.repaintEverything();
+      unref(plumb).repaintEverything();
     }
   }
 
@@ -536,8 +528,8 @@
 
   // 清除画布
   function clear() {
-    flowData.nodeList.forEach((node) => {
-      plumb.value.remove(node.id);
+    flowData.nodeList.forEach((node: INode) => {
+      unref(plumb).remove(node.id);
     });
     currentSelect.value = undefined;
     currentSelectGroup.value = [];

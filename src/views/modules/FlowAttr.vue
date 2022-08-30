@@ -1,5 +1,6 @@
 <template>
-  <a-tabs size="small" defaultActiveKey="flow-attr" :activeKey="activeKey">
+  <a-tabs size="small" :activeKey="activeKey">
+    <!-- 流程属性 -->
     <a-tab-pane key="flow-attr">
       <template #tab>
         <span>
@@ -13,6 +14,7 @@
         </a-form-item>
       </a-form>
     </a-tab-pane>
+    <!-- 节点属性 -->
     <a-tab-pane key="node-attr">
       <template #tab>
         <span>
@@ -20,148 +22,23 @@
           节点属性
         </span>
       </template>
-      <template v-if="currentSelect.type === CommonNodeTypeEnum.START">
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
-      <template v-if="currentSelect.type === CommonNodeTypeEnum.END">
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
-      <template v-if="currentSelect.type === CommonNodeTypeEnum.COMMON">
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
-      <template v-else-if="currentSelect.type === CommonNodeTypeEnum.FREEDOM">
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
-      <template v-else-if="currentSelect.type === CommonNodeTypeEnum.EVENT">
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
-      <template v-else-if="currentSelect.type === CommonNodeTypeEnum.GATEWAY">
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
-      <template v-else-if="currentSelect.type === HighNodeTypeEnum.CHILD_FLOW">
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
-      <template
-        v-else-if="
-          currentSelect.type === LaneNodeTypeEnum.X_LANE ||
-          currentSelect.type === LaneNodeTypeEnum.Y_LANE
-        "
-      >
-        <a-form layout="vertical">
-          <a-form-item label="类型">
-            <a-tag color="purple">{{ currentSelect.type }}</a-tag>
-          </a-form-item>
-          <a-form-item label="id">
-            <a-input :value="currentSelect.id" disabled />
-          </a-form-item>
-          <a-form-item label="名称">
-            <a-input
-              placeholder="请输入节点名称"
-              :value="(currentSelect as INode)?.nodeName"
-              @change="nodeNameChange"
-            />
-          </a-form-item>
-        </a-form>
-      </template>
+      <a-form layout="vertical">
+        <a-form-item label="类型">
+          <a-tag color="purple">{{ currentSelect.type }}</a-tag>
+        </a-form-item>
+        <a-form-item label="id">
+          <a-input :value="currentSelect.id" disabled />
+        </a-form-item>
+        <a-form-item label="名称" v-if="isAllowChange(currentSelect.type as NodesType)">
+          <a-input
+            placeholder="请输入节点名称"
+            :value="(currentSelect as INode)?.nodeName"
+            @change="nodeNameChange"
+          />
+        </a-form-item>
+      </a-form>
     </a-tab-pane>
+    <!-- 连线属性 -->
     <a-tab-pane key="link-attr">
       <template #tab>
         <span>
@@ -188,9 +65,10 @@
 </template>
 
 <script lang="ts" setup>
+  import { ChangeEvent } from 'ant-design-vue/lib/_util/EventInterface';
   import { ref, watch, unref, PropType } from 'vue';
-  import { CommonNodeTypeEnum, HighNodeTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
-  import { INode, ILink } from '/@/type/index';
+  import { INode, ILink, NodesType } from '/@/type/index';
+  import { CommonNodeTypeEnum } from '/@/type/enums';
 
   const props = defineProps({
     plumb: {
@@ -213,22 +91,33 @@
 
   const activeKey = ref<string>('flow-attr');
 
-  function nodeNameChange(e) {
-    (currentSelect.value as INode).nodeName = e.target.value;
+  // 修改节点名称
+  function nodeNameChange(e: ChangeEvent) {
+    (currentSelect.value as INode).nodeName = e.target.value ?? '';
   }
 
-  function linkLabelChange(e) {
-    let label = e.target.value;
+  // 是否可以修改节点名称
+  function isAllowChange(type: NodesType) {
+    return ![
+      CommonNodeTypeEnum.START,
+      CommonNodeTypeEnum.END,
+      CommonNodeTypeEnum.GATEWAY,
+      CommonNodeTypeEnum.EVENT,
+    ].includes(type as CommonNodeTypeEnum);
+  }
+
+  // 修改连接文本
+  function linkLabelChange(e: ChangeEvent) {
+    let label = e.target.value ?? '';
     (currentSelect.value as ILink).label = label;
     let conn = props.plumb.getConnections({
       source: (unref(currentSelect) as ILink).sourceId,
       target: (unref(currentSelect) as ILink).targetId,
     })[0];
     let link_id = conn.canvas.id;
-    let labelHandle = (e) => {
-      let event = window.event || e;
-      event.stopPropagation();
-      currentSelect.value = props.flowData.linkList.filter((l) => l.id === link_id)[0];
+    let labelHandle = (e: Event) => {
+      e.stopPropagation();
+      currentSelect.value = props.flowData.linkList.find((l: ILink) => l.id === link_id);
     };
 
     if (label !== '') {
@@ -251,10 +140,10 @@
     () => props.select,
     (val) => {
       currentSelect.value = val;
-      if (unref(currentSelect)?.type === 'link') {
-        activeKey.value = 'link-attr';
-      } else if (!unref(currentSelect)?.type) {
+      if (!unref(currentSelect)?.type) {
         activeKey.value = 'flow-attr';
+      } else if (unref(currentSelect)?.type === 'link') {
+        activeKey.value = 'link-attr';
       } else {
         activeKey.value = 'node-attr';
       }
@@ -263,10 +152,9 @@
   );
 
   watch(
-    () => currentSelect,
+    () => currentSelect.value,
     (currentSelect) => {
-      emits('update:select', currentSelect.value);
+      emits('update:select', currentSelect);
     },
-    { deep: true },
   );
 </script>

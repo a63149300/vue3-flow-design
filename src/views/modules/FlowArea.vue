@@ -1,24 +1,20 @@
 <template>
-  <div
-    style="width: 100%; height: 100%; overflow: hidden; position: relative"
-    @dragover="allowDrop"
-    @drop="drop"
-  >
+  <div class="flow-area" @dragover="allowDrop" @drop="drop">
     <!--辅助线X-->
     <div
       v-if="container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowXLine"
-      class="auxiliary-line-x"
+      class="flow-area__lineX"
       :style="{ top: auxiliaryLinePos.y + 'px' }"
     ></div>
     <!--辅助线Y-->
     <div
       v-if="container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowYLine"
-      class="auxiliary-line-y"
+      class="flow-area__lineY"
       :style="{ left: auxiliaryLinePos.x + 'px' }"
     ></div>
     <div
       id="flowContainer"
-      class="flow-container"
+      class="flow-area__container"
       :class="{
         grid: flowData.config.showGrid,
         canScale: container.scaleFlag,
@@ -50,7 +46,7 @@
         @hideAlignLine="hideAlignLine"
       />
       <div
-        class="rectangle-multiple"
+        class="flow-area__multiple"
         v-if="rectangleMultiple.flag && rectangleMultiple.multipling"
         :style="{
           top: rectangleMultiple.position.top + 'px',
@@ -60,20 +56,20 @@
         }"
       ></div>
     </div>
-    <div class="container-scale">
-      <a-button size="small" type="default" @click="enlargeContainer">
-        <template #icon>
-          <component :is="'ZoomInOutlined'" />
-        </template>
-      </a-button>
-      <span>{{ container.scaleShow }}% </span>
+    <div class="flow-area__scale">
       <a-button size="small" type="default" @click="narrowContainer">
         <template #icon>
           <component :is="'ZoomOutOutlined'" />
         </template>
       </a-button>
+      <span>{{ container.scaleShow }}% </span>
+      <a-button size="small" type="default" @click="enlargeContainer">
+        <template #icon>
+          <component :is="'ZoomInOutlined'" />
+        </template>
+      </a-button>
     </div>
-    <div class="mouse-position"> x: {{ mouse.position.x }}, y: {{ mouse.position.y }} </div>
+    <div class="flow-area__position"> x: {{ mouse.position.x }}, y: {{ mouse.position.y }} </div>
   </div>
 </template>
 
@@ -182,7 +178,7 @@
 
   // 鼠标划框多选
   const rectangleMultiple = reactive({
-    flag: false, // 是否按了ctrl键
+    flag: false, // 是否按了shift键
     multipling: false,
     position: {
       top: 0,

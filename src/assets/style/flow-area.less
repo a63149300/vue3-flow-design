@@ -1,84 +1,74 @@
 @active-color: #409eff;
 
-.btn-wrapper-simple {
-  height: 24px !important;
-  line-height: 24px !important;
-}
-
-.vue-contextmenu-listWrapper {
-  padding-left: 1px !important;
-}
-
-.child-ul-wrapper {
-  padding-left: 1px !important;
-}
-
-.flow-container {
-  width: 3000px;
-  height: 3000px;
-  position: relative;
-  transition: transform 0.5s ease 0s, transform-origin 0.5s ease 0s;
-
-  &.grid {
-    background: url('../images/grid-bg.jpg') repeat left top;
-    background-size: 60px 60px;
-  }
-
-  &.canScale {
-    cursor: url('../images/search.png'), default;
-  }
-
-  &.canDrag {
-    cursor: grab;
-  }
-
-  &.canMultiple {
-    cursor: url('../images/multip-pointer.png'), default;
-  }
-}
-
-.rectangle-multiple {
-  position: absolute;
-  border: 1px dashed #31676f;
-}
-
-.flow-container-active {
-  background-color: #e4e4e4;
-  cursor: crosshair;
-}
-
-.auxiliary-line-x {
-  position: absolute;
-  border: 0.5px solid @active-color;
+.flow-area {
   width: 100%;
-  z-index: 9999;
-}
-
-.auxiliary-line-y {
-  position: absolute;
-  border: 0.5px solid @active-color;
   height: 100%;
-  z-index: 9999;
-}
+  overflow: hidden;
+  position: relative;
 
-.link-active {
-  outline: 2px dashed @active-color;
-}
-
-.container-scale {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-
-  > span {
-    display: inline-block;
-    width: 40px;
-    text-align: center;
+  &__lineX {
+    position: absolute;
+    border: 0.5px solid @active-color;
+    width: 100%;
+    z-index: 9999;
   }
-}
 
-.mouse-position {
-  position: absolute;
-  bottom: 0;
-  right: 5px;
+  &__lineY {
+    position: absolute;
+    border: 0.5px solid @active-color;
+    height: 100%;
+    z-index: 9999;
+  }
+
+  &__container {
+    width: 3000px;
+    height: 3000px;
+    position: relative;
+    transition: transform 0.5s ease 0s, transform-origin 0.5s ease 0s;
+
+    &.grid {
+      background: url('../images/grid-bg.jpg') repeat left top;
+      background-size: 60px 60px;
+    }
+
+    &.canScale {
+      cursor: url('../images/search.png'), default;
+    }
+
+    &.canDrag {
+      cursor: grab;
+    }
+
+    &.canMultiple {
+      cursor: url('../images/multip-pointer.png'), default;
+    }
+  }
+
+  &__multiple {
+    position: absolute;
+    border: 1px dashed #31676f;
+  }
+
+  &__scale {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+    > span {
+      display: inline-block;
+      text-align: center;
+      color: #666;
+      padding: 0 4px;
+    }
+  }
+
+  &__position {
+    position: absolute;
+    bottom: 0;
+    right: 5px;
+  }
+
+  .link-active {
+    outline: 2px dashed @active-color;
+  }
 }

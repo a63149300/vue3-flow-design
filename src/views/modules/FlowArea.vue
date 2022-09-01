@@ -203,7 +203,7 @@
     };
   });
 
-  function allowDrop(e: Event) {
+  function allowDrop(e: MouseEvent) {
     e.preventDefault();
     mousemoveHandler(e);
   }
@@ -245,17 +245,17 @@
   }
 
   // 画布鼠标移动
-  function mousemoveHandler(e) {
-    let event = window.event || e;
+  function mousemoveHandler(e: MouseEvent) {
+    const target = e?.target as HTMLElement;
 
-    if (event.target.id === 'flowContainer') {
+    if (target.id === 'flowContainer') {
       mouse.position = {
-        x: event.offsetX,
-        y: event.offsetY,
+        x: e.offsetX,
+        y: e.offsetY,
       };
     } else {
-      let cn = event.target.className;
-      let tn = event.target.tagName;
+      let cn = target.className;
+      let tn = target.tagName;
       if (
         cn !== 'lane-text' &&
         cn !== 'lane-text-div' &&
@@ -263,8 +263,8 @@
         tn !== 'path' &&
         tn !== 'I'
       ) {
-        mouse.position.x = event.target.offsetLeft + event.offsetX;
-        mouse.position.y = event.target.offsetTop + event.offsetY;
+        mouse.position.x = target.offsetLeft + e.offsetX;
+        mouse.position.y = target.offsetTop + e.offsetY;
       }
     }
     if (container.draging) {
@@ -302,7 +302,7 @@
   }
 
   // x, y取整计算
-  function computeNodePos(x, y) {
+  function computeNodePos(x: number, y: number) {
     const pxx = flowConfig.defaultStyle.alignGridPX[0];
     const pxy = flowConfig.defaultStyle.alignGridPX[1];
     if (x % pxx) x = pxx - (x % pxx) + x;
@@ -314,14 +314,14 @@
   }
 
   // 增加画布节点
-  function addNewNode(node) {
+  function addNewNode(node: IElement) {
     let x = mouse.position.x;
     let y = mouse.position.y;
     let nodePos = computeNodePos(x, y);
     x = nodePos.x;
     y = nodePos.y;
 
-    let newNode = Object.assign({}, node);
+    let newNode = Object.assign({}, node) as INode;
     newNode.id = newNode.type + '-' + utils.getId();
     newNode.height = 50;
     if (
@@ -349,10 +349,8 @@
   }
 
   // 画布鼠标按下
-  function mousedownHandler(e) {
-    let event = window.event || e;
-
-    if (event.button === 0) {
+  function mousedownHandler(e: MouseEvent) {
+    if (e.button === 0) {
       if (container.dragFlag) {
         mouse.tempPos = mouse.position;
         container.draging = true;
@@ -386,7 +384,7 @@
     let bx = ax + rectangleMultiple.width;
 
     let nodeList = unref(flowData).nodeList;
-    nodeList.forEach((node) => {
+    nodeList.forEach((node: INode) => {
       if (node.y >= ay && node.x >= ax && node.y <= by && node.x <= bx) {
         props.plumb.addToDragSelection(node.id);
         currentSelectGroup.value.push(node);
@@ -395,11 +393,9 @@
   }
 
   // 画布鼠标滚轴
-  function scaleContainer(e) {
-    let event = window.event || e;
-
+  function scaleContainer(e: WheelEvent) {
     if (container.scaleFlag) {
-      if (event.deltaY < 0) {
+      if (e.deltaY < 0) {
         enlargeContainer();
       } else if (container.scale) {
         narrowContainer();
@@ -552,7 +548,7 @@
 
   // 全选
   function selectAll() {
-    unref(flowData).nodeList.forEach((node) => {
+    unref(flowData).nodeList.forEach((node: INode) => {
       props.plumb.addToDragSelection(node.id);
       currentSelectGroup.value.push(node);
     });
@@ -581,7 +577,7 @@
     let baseY = selectGroup[0].y;
     for (let i = 1; i < selectGroup.length; i++) {
       baseY = baseY + selectGroup[i - 1].height + flowConfig.defaultStyle.alignSpacing.vertical;
-      let f = nodeList.filter((n) => n.id === selectGroup[i].id)[0];
+      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
       props.plumb.animate(
@@ -609,7 +605,7 @@
     for (let i = 1; i < selectGroup.length; i++) {
       baseY = baseY + selectGroup[i - 1].height + flowConfig.defaultStyle.alignSpacing.vertical;
       baseX = firstX + utils.div(selectGroup[0].width, 2) - utils.div(selectGroup[i].width, 2);
-      let f = nodeList.filter((n) => n.id === selectGroup[i].id)[0];
+      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
       props.plumb.animate(
@@ -637,7 +633,7 @@
     for (let i = 1; i < selectGroup.length; i++) {
       baseY = baseY + selectGroup[i - 1].height + flowConfig.defaultStyle.alignSpacing.vertical;
       baseX = firstX + selectGroup[0].width - selectGroup[i].width;
-      let f = nodeList.filter((n) => n.id === selectGroup[i].id)[0];
+      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
       props.plumb.animate(
@@ -663,7 +659,7 @@
     let baseY = selectGroup[0].y;
     for (let i = 1; i < selectGroup.length; i++) {
       baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.level;
-      let f = nodeList.filter((n) => n.id === selectGroup[i].id)[0];
+      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
       props.plumb.animate(
@@ -691,7 +687,7 @@
     for (let i = 1; i < selectGroup.length; i++) {
       baseY = firstY + utils.div(selectGroup[0].height, 2) - utils.div(selectGroup[i].height, 2);
       baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.level;
-      let f = nodeList.filter((n) => n.id === selectGroup[i].id)[0];
+      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
       props.plumb.animate(
@@ -719,7 +715,7 @@
     for (let i = 1; i < selectGroup.length; i++) {
       baseY = firstY + selectGroup[0].height - selectGroup[i].height;
       baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.level;
-      let f = nodeList.filter((n) => n.id === selectGroup[i].id)[0];
+      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
       props.plumb.animate(
@@ -747,7 +743,7 @@
   }
 
   // 查询删除节点关联的连接线
-  function getConnectionsByNodeId(nodeId) {
+  function getConnectionsByNodeId(nodeId: string) {
     let conns1 = props.plumb.getConnections({
       source: nodeId,
     });
@@ -769,10 +765,10 @@
 
     arr.forEach((c) => {
       let conns = getConnectionsByNodeId(c.id);
-      conns.forEach((conn) => {
+      conns.forEach((conn: Recordable) => {
         linkList.splice(
           linkList.findIndex(
-            (link) => link.sourceId === conn.sourceId && link.targetId === conn.targetId,
+            (link: ILink) => link.sourceId === conn.sourceId && link.targetId === conn.targetId,
           ),
           1,
         );
@@ -783,7 +779,7 @@
           })[0],
         );
       });
-      let inx = nodeList.findIndex((node) => node.id === c.id);
+      let inx = nodeList.findIndex((node: INode) => node.id === c.id);
       nodeList.splice(inx, 1);
     });
     flowData.value.status = flowConfig.flowStatus.CREATE;
@@ -802,7 +798,7 @@
     emits('getShortcut');
   }
   // 是否为多选行为
-  function isMultiple(callback) {
+  function isMultiple(callback: Fn) {
     callback(rectangleMultiple.flag);
   }
   // 更新组节点信息
@@ -812,19 +808,19 @@
       let dom = document.querySelector('#' + node.id) as HTMLElement;
       let l = parseInt(dom?.style?.left);
       let t = parseInt(dom?.style?.top);
-      let f = nodeList.filter((n) => n.id === node.id)[0];
+      let f = nodeList.find((n: INode) => n.id === node.id);
       f.x = l;
       f.y = t;
     });
   }
 
   // 计算辅助线
-  function alignForLine(e) {
+  function alignForLine(e: Recordable) {
     if (props.selectGroup.length > 1) return;
     if (container.auxiliaryLine.controlFnTimesFlag) {
       let elId = e.el.id;
       let nodeList = unref(flowData).nodeList;
-      nodeList.forEach((node) => {
+      nodeList.forEach((node: INode) => {
         if (elId !== node.id) {
           let dis = flowConfig.defaultStyle.showAuxiliaryLineDistance,
             elPos = e.pos,

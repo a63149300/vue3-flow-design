@@ -248,12 +248,12 @@
   // 点击节点
   function selectNode() {
     currentSelect.value = currentNode;
-    emits('isMultiple', (flag) => {
+    emits('isMultiple', (flag: boolean) => {
       if (!flag) {
         currentSelectGroup.value = [];
       } else {
-        let f = unref(currentSelectGroup).filter((s) => s.id === currentNode.id);
-        if (f.length <= 0) {
+        let f = unref(currentSelectGroup).find((s) => s.id === currentNode.id);
+        if (f) {
           props.plumb.addToDragSelection(currentNode.id);
           currentSelectGroup.value.push(currentNode);
         }

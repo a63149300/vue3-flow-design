@@ -165,6 +165,7 @@
     flowData.status = flowConfig.flowStatus.LOADING;
     unref(plumb).batch(async () => {
       flowData.nodeList = loadData.nodeList;
+      await nextTick();
       let linkList = loadData.linkList;
       flowData.linkList = linkList;
       linkList.forEach((link: ILink) => {

@@ -261,7 +261,7 @@
     });
   }
   // 节点右键
-  function showNodeContextMenu(e) {
+  function showNodeContextMenu(e: MouseEvent) {
     emits('showNodeContextMenu', e);
     selectNode();
   }
@@ -284,11 +284,10 @@
   );
 
   watch(
-    () => currentSelect,
+    () => currentSelect.value,
     (currentSelect) => {
-      emits('update:select', currentSelect.value);
+      emits('update:select', currentSelect);
     },
-    { deep: true },
   );
 
   watch(
@@ -299,9 +298,9 @@
   );
 
   watch(
-    () => currentSelectGroup,
+    () => currentSelectGroup.value,
     (currentSelectGroup) => {
-      emits('update:selectGroup', currentSelectGroup.value);
+      emits('update:selectGroup', currentSelectGroup);
     },
   );
 

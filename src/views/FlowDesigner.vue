@@ -7,7 +7,13 @@
       <Toolbar
         :currentTool="currentTool"
         :flowData="flowData"
-        @exportFlowPicture="exportFlowPicture"
+        @generateFlowImage="
+          generateFlowImage(
+            flowAreaRef,
+            flowData.nodeList,
+            flowConfig.defaultStyle.photoBlankDistance,
+          )
+        "
         @selectTool="selectTool"
         @clear="clear"
         @toggleShowGrid="toggleShowGrid"
@@ -39,37 +45,38 @@
       <!-- 组件属性区 -->
       <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
     </a-layout-sider>
-
-    <!-- 生成流程图片 -->
-    <a-modal
-      :title="'流程设计图_' + flowData.attr.id + '.png'"
-      centered
-      width="90%"
-      :closable="flowPicture.closable"
-      :maskClosable="flowPicture.maskClosable"
-      :visible="flowPicture.modalVisible"
-      okText="下载到本地"
-      cancelText="取消"
-      @ok="downLoadFlowPicture"
-      @cancel="cancelDownLoadFlowPicture"
-    >
-      <img :src="flowPicture.url" style="width: 100%" />
-    </a-modal>
-    <!-- 设置 -->
-    <setting-modal ref="settingModalRef" v-model:config="flowConfig" />
-    <!-- 快捷键大全 -->
-    <ShortcutModal ref="shortcutModalRef" />
-    <!-- 测试 -->
-    <TestModal v-model:testVisible="testVisible" :flowData="flowData" @loadFlow="loadFlow" />
   </a-layout>
+
+  <!-- 生成流程图片 -->
+  <a-modal
+    :title="'流程设计图_' + flowData.attr.id + '.png'"
+    centered
+    width="90%"
+    :closable="flowImage.closable"
+    :maskClosable="flowImage.maskClosable"
+    :visible="flowImage.modalVisible"
+    okText="下载到本地"
+    cancelText="取消"
+    @ok="downLoadFlowImage(flowData.attr.id)"
+    @cancel="cancelDownLoadFlowImage"
+  >
+    <img :src="flowImage.url" style="width: 100%" />
+  </a-modal>
+
+  <!-- 设置 -->
+  <setting-modal ref="settingModalRef" v-model:config="flowConfig" />
+
+  <!-- 快捷键大全 -->
+  <ShortcutModal ref="shortcutModalRef" />
+
+  <!-- 测试 -->
+  <TestModal v-model:testVisible="testVisible" :flowData="flowData" @loadFlow="loadFlow" />
 </template>
 
 <script lang="ts" setup>
   import { jsPlumb, Defaults } from 'jsplumb';
   import { reactive, ref, onMounted, nextTick, unref } from 'vue';
   import { message } from 'ant-design-vue';
-  import canvg from 'canvg';
-  import html2canvas from 'html2canvas';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
   import SettingModal from './modules/SettingModal.vue';
@@ -83,9 +90,13 @@
   import { ToolsTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
   import { utils } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
+  import { useGenerateFlowImage } from '/@/hooks/useGenerateFlowImage';
   import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
 
   const [createContextMenu] = useContextMenu();
+
+  const { flowImage, downLoadFlowImage, cancelDownLoadFlowImage, generateFlowImage } =
+    useGenerateFlowImage(checkFlow);
 
   // 流程配置
   const flowConfig = reactive(defaultFlowConfig);
@@ -131,14 +142,6 @@
 
   // 画布聚焦开启快捷键
   let activeShortcut = true;
-
-  // 生成流程图片
-  const flowPicture = reactive({
-    url: '',
-    modalVisible: false,
-    closable: false,
-    maskClosable: false,
-  });
 
   // 拖拽组件元素信息
   const dragInfo = reactive<IDragInfo>({
@@ -214,31 +217,6 @@
     flowAreaRef.value.container.pos = {
       top: 0,
       left: 0,
-    };
-  }
-
-  // 计算流程图宽高
-  function computeCanvasSize() {
-    let nodeList = Object.assign([], flowData.nodeList),
-      minX = nodeList[0].x,
-      minY = nodeList[0].y,
-      maxX = nodeList[0].x + nodeList[0].width,
-      maxY = nodeList[0].y + nodeList[0].height;
-    nodeList.forEach((node: INode) => {
-      minX = Math.min(minX, node.x);
-      minY = Math.min(minY, node.y);
-      maxX = Math.max(maxX, node.x + node.width);
-      maxY = Math.max(maxY, node.y + node.height);
-    });
-    let canvasWidth = maxX - minX;
-    let canvasHeight = maxY - minY;
-    return {
-      width: canvasWidth,
-      height: canvasHeight,
-      minX: minX,
-      minY: minY,
-      maxX: maxX,
-      maxY: maxY,
     };
   }
 
@@ -565,70 +543,6 @@
   // 快捷键大全
   function shortcutHelper() {
     shortcutModalRef.value.open();
-  }
-
-  // 生成流程图片
-  function exportFlowPicture() {
-    if (!checkFlow()) return;
-
-    let $Container = flowAreaRef.value.$el.children[0];
-    let svgElems = $Container.querySelectorAll('svg[id^="link-"]');
-    let removeArr: string[] = [];
-
-    svgElems.forEach((svgElem: HTMLElement) => {
-      let linkCanvas = document.createElement('canvas');
-      let canvasId = 'linkCanvas-' + utils.getId();
-      linkCanvas.id = canvasId;
-      removeArr.push(canvasId);
-
-      let svgContent = svgElem.outerHTML.trim();
-      canvg(linkCanvas, svgContent);
-      if (svgElem.style.position) {
-        linkCanvas.style.position += svgElem.style.position;
-        linkCanvas.style.left += svgElem.style.left;
-        linkCanvas.style.top += svgElem.style.top;
-      }
-      $Container.appendChild(linkCanvas);
-    });
-
-    let canvasSize = computeCanvasSize();
-
-    let pbd = flowConfig.defaultStyle.photoBlankDistance;
-    let offsetPbd = utils.div(pbd, 2);
-
-    html2canvas($Container, {
-      width: canvasSize.maxX + offsetPbd,
-      height: canvasSize.maxY + offsetPbd,
-      scrollX: 0,
-      scrollY: 0,
-      logging: false,
-      onclone: () => {
-        removeArr.forEach((id) => {
-          let currentNode = document.querySelector('#' + id);
-          currentNode?.parentNode?.removeChild(currentNode);
-        });
-      },
-    }).then((canvas) => {
-      let dataURL = canvas.toDataURL('image/png');
-      flowPicture.url = dataURL;
-      flowPicture.modalVisible = true;
-    });
-  }
-
-  // 下载图片
-  function downLoadFlowPicture() {
-    let alink = document.createElement('a');
-    let alinkId = 'alink-' + utils.getId();
-    alink.id = alinkId;
-    alink.href = flowPicture.url;
-    alink.download = '流程设计图_' + flowData.attr.id + '.png';
-    alink.click();
-  }
-
-  // 取消下载
-  function cancelDownLoadFlowPicture() {
-    flowPicture.url = '';
-    flowPicture.modalVisible = false;
   }
 
   onMounted(() => {

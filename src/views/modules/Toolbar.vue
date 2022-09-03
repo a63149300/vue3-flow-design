@@ -18,7 +18,7 @@
 
     <div class="header-option__buttons">
       <a-tooltip title="生成流程图片" placement="bottom">
-        <a-button @click="emits('exportFlowPicture')" class="header-option__button" size="small">
+        <a-button @click="emits('generateFlowImage')" class="header-option__button" size="small">
           <template #icon>
             <component :is="'PictureOutlined'" />
           </template>
@@ -101,7 +101,7 @@
 
   const emits = defineEmits([
     'selectTool',
-    'exportFlowPicture',
+    'generateFlowImage',
     'clear',
     'toggleShowGrid',
     'setting',

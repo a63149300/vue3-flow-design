@@ -1,6 +1,6 @@
 <template>
   <a-layout-footer class="flow-footer">
-    <span>Vue3-Flow-Design, Powered by 前端爱码士</span>
+    <span>Vue3-Flow-Design 2.0.0, Powered by 前端爱码士</span>
     <a-tooltip title="GIT地址" placement="top">
       <a-button @click="goGit" type="link" size="small">
         <template #icon>

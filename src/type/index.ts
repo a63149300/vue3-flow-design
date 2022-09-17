@@ -49,7 +49,7 @@ export interface ILink {
   };
 }
 
-export interface IShortcut {
+export interface IShortcutKey {
   code: string;
   codeName: string;
   shortcutName: string;

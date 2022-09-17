@@ -122,7 +122,7 @@
 
   const emits = defineEmits([
     'selectTool',
-    'getShortcut',
+    'onShortcutKey',
     'saveFlow',
     'update:select',
     'update:selectGroup',
@@ -795,7 +795,7 @@
   function selectContainer() {
     currentSelect.value = {} as INode | ILink;
     // 开启快捷键
-    emits('getShortcut');
+    emits('onShortcutKey');
   }
   // 是否为多选行为
   function isMultiple(callback: Fn) {

@@ -12,6 +12,7 @@
             flowAreaRef,
             flowData.nodeList,
             flowConfig.defaultStyle.photoBlankDistance,
+            checkFlow,
           )
         "
         @selectTool="selectTool"
@@ -34,14 +35,14 @@
           :plumb="plumb"
           :currentTool="currentTool"
           @selectTool="selectTool"
-          @getShortcut="getShortcut"
+          @onShortcutKey="onShortcutKey"
           @saveFlow="saveFlow"
         />
       </a-layout-content>
       <!-- 底部 -->
       <flow-footer />
     </a-layout>
-    <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
+    <a-layout-sider width="250" theme="light" class="attr-area" @mousedown.stop="offShortcutKey">
       <!-- 组件属性区 -->
       <flow-attr :plumb="plumb" :flowData="flowData" v-model:select="currentSelect" />
     </a-layout-sider>
@@ -67,7 +68,7 @@
   <setting-modal ref="settingModalRef" v-model:config="flowConfig" />
 
   <!-- 快捷键大全 -->
-  <ShortcutModal ref="shortcutModalRef" />
+  <ShortcutKeyModal ref="shortcutModalRef" />
 
   <!-- 测试 -->
   <TestModal v-model:testVisible="testVisible" :flowData="flowData" @loadFlow="loadFlow" />
@@ -80,7 +81,7 @@
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
   import SettingModal from './modules/SettingModal.vue';
-  import ShortcutModal from './modules/ShortcutModal.vue';
+  import ShortcutKeyModal from './modules/ShortcutKeyModal.vue';
   import TestModal from './modules/TestModal.vue';
   import FlowElement from './modules/FlowElement.vue';
   import Toolbar from './modules/Toolbar.vue';
@@ -91,13 +92,17 @@
   import { utils } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { useGenerateFlowImage } from '/@/hooks/useGenerateFlowImage';
+  import { useShortcutKey } from '/@/hooks/useShortcutKey';
   import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
 
   const [createContextMenu] = useContextMenu();
 
   // 生成流程图片
   const { flowImage, downLoadFlowImage, cancelDownLoadFlowImage, generateFlowImage } =
-    useGenerateFlowImage(checkFlow);
+    useGenerateFlowImage();
+
+  // 快捷键
+  const { listenShortcutKey, offShortcutKey, onShortcutKey } = useShortcutKey();
 
   // 流程配置
   const flowConfig = reactive(defaultFlowConfig);
@@ -140,9 +145,6 @@
 
   // 当前选择组
   const currentSelectGroup = ref<INode[]>([]);
-
-  // 画布聚焦开启快捷键
-  let activeShortcut = true;
 
   // 拖拽组件元素信息
   const dragInfo = reactive<IDragInfo>({
@@ -368,16 +370,6 @@
     console.log(flowObj);
   }
 
-  // 设置快捷键失效
-  function loseShortcut() {
-    activeShortcut = false;
-  }
-
-  // 设置快捷键启用
-  function getShortcut() {
-    activeShortcut = true;
-  }
-
   // 设置dragInfo
   function setDragInfo(info: IDragInfo) {
     dragInfo.type = info.type;
@@ -449,63 +441,6 @@
     }
   }
 
-  // 初始化快捷键
-  function listenShortcut() {
-    document.onkeydown = (e: KeyboardEvent) => {
-      // 画布聚焦开启快捷键
-      if (!activeShortcut) return;
-      let key = e.code;
-
-      switch (key) {
-        case flowConfig.shortcut.multiple.code.split(',')[0]:
-        case flowConfig.shortcut.multiple.code.split(',')[1]:
-          flowAreaRef.value.rectangleMultiple.flag = true;
-          break;
-        case flowConfig.shortcut.dragContainer.code:
-          flowAreaRef.value.container.dragFlag = true;
-          break;
-        case flowConfig.shortcut.dragTool.code:
-          selectTool(ToolsTypeEnum.DRAG);
-          break;
-        case flowConfig.shortcut.connTool.code:
-          selectTool(ToolsTypeEnum.CONNECTION);
-          break;
-        case flowConfig.shortcut.leftMove.code:
-          moveNode('left');
-          break;
-        case flowConfig.shortcut.upMove.code:
-          moveNode('up');
-          break;
-        case flowConfig.shortcut.rightMove.code:
-          moveNode('right');
-          break;
-        case flowConfig.shortcut.downMove.code:
-          moveNode('down');
-          break;
-      }
-
-      if (e.ctrlKey) {
-        switch (key) {
-          case flowConfig.shortcut.settingModal.code:
-            saveFlow();
-            break;
-          case flowConfig.shortcut.testModal.code:
-            openTest();
-            break;
-        }
-      }
-    };
-    // 拖拽、缩放、多选快捷键复位
-    document.onkeyup = (event: KeyboardEvent) => {
-      let key = event.code;
-      if (key === flowConfig.shortcut.dragContainer.code) {
-        flowAreaRef.value.container.dragFlag = false;
-      } else if (flowConfig.shortcut.multiple.code.includes(key)) {
-        flowAreaRef.value.rectangleMultiple.flag = false;
-      }
-    };
-  }
-
   // 清除画布
   function clear() {
     flowData.nodeList.forEach((node: INode) => {
@@ -520,15 +455,9 @@
   // 显示隐藏网格
   function toggleShowGrid() {
     let flag = flowData.config.showGrid;
-    if (flag) {
-      flowData.config.showGrid = false;
-      flowData.config.showGridText = '显示网格';
-      flowData.config.showGridIcon = 'EyeInvisibleOutlined';
-    } else {
-      flowData.config.showGrid = true;
-      flowData.config.showGridText = '隐藏网格';
-      flowData.config.showGridIcon = 'EyeOutlined';
-    }
+    flowData.config.showGrid = !flag;
+    flowData.config.showGridText = flag ? '显示网格' : '隐藏网格';
+    flowData.config.showGridIcon = flag ? 'EyeInvisibleOutlined' : 'EyeOutlined';
   }
 
   // 测试
@@ -549,10 +478,18 @@
   onMounted(() => {
     // 实例化JsPlumb
     initJsPlumb();
+
     // 初始化快捷键
-    listenShortcut();
+    listenShortcutKey(flowConfig, unref(flowAreaRef), {
+      selectTool,
+      moveNode,
+      saveFlow,
+      openTest,
+    });
+
     // 初始化流程图
     initFlow();
+
     // 关闭提示
     listenPage();
   });

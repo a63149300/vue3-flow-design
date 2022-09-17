@@ -3,7 +3,7 @@ import canvg from 'canvg';
 import html2canvas from 'html2canvas';
 import { utils } from '/@/utils/common';
 
-export function useGenerateFlowImage(checkFlow) {
+export function useGenerateFlowImage() {
   // 生成流程图片
   const flowImage = reactive({
     url: '',
@@ -54,7 +54,7 @@ export function useGenerateFlowImage(checkFlow) {
   }
 
   // 生成流程图片
-  function generateFlowImage(flowAreaRef, nodeList, photoBlankDistance) {
+  function generateFlowImage(flowAreaRef, nodeList, photoBlankDistance, checkFlow) {
     if (!checkFlow()) return;
 
     const $Container = flowAreaRef.$el.children[0];

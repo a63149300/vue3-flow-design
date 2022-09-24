@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, watch } from 'vue';
+  import { reactive, watch } from 'vue';
   import { ColorPicker } from 'vue3-colorpicker';
   import 'vue3-colorpicker/style.css';
 
@@ -128,25 +128,23 @@
       type: Object,
       default: () => ({}),
     },
+    settingVisible: {
+      type: Boolean,
+      default: false,
+    },
   });
 
-  const emits = defineEmits(['update:config']);
+  const emits = defineEmits(['update:config', 'update:settingVisible']);
 
   const flowConfig = reactive(props.config);
-
-  const settingVisible = ref<boolean>(false);
 
   const formItemLayout = reactive({
     labelCol: { span: 7 },
     wrapperCol: { span: 16 },
   });
 
-  function open() {
-    settingVisible.value = true;
-  }
-
   function close() {
-    settingVisible.value = false;
+    emits('update:settingVisible', false);
   }
 
   // 手动触发resize，修复ColorPicker位置
@@ -169,6 +167,4 @@
       emits('update:config', val);
     },
   );
-
-  defineExpose({ open });
 </script>

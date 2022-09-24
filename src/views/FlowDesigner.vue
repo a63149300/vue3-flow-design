@@ -65,7 +65,7 @@
   </a-modal>
 
   <!-- 设置 -->
-  <setting-modal ref="settingModalRef" v-model:config="flowConfig" />
+  <SettingModal v-model:settingVisible="settingVisible" v-model:config="flowConfig" />
 
   <!-- 快捷键大全 -->
   <ShortcutKeyModal ref="shortcutModalRef" />
@@ -116,11 +116,11 @@
   // 画布Ref
   const flowAreaRef = ref();
 
-  // 设置Ref
-  const settingModalRef = ref();
-
   // 快捷键大全Ref
   const shortcutModalRef = ref();
+
+  // 设置弹窗显隐
+  const settingVisible = ref<boolean>(false);
 
   // 测试弹窗显隐
   const testVisible = ref<boolean>(false);
@@ -467,7 +467,7 @@
 
   // 设置
   function setting() {
-    settingModalRef.value.open();
+    settingVisible.value = true;
   }
 
   // 快捷键大全

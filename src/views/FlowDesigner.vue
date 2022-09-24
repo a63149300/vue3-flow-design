@@ -68,7 +68,7 @@
   <SettingModal v-model:settingVisible="settingVisible" v-model:config="flowConfig" />
 
   <!-- 快捷键大全 -->
-  <ShortcutKeyModal ref="shortcutModalRef" />
+  <ShortcutKeyModal v-model:shortcutVisible="shortcutVisible" />
 
   <!-- 测试 -->
   <TestModal v-model:testVisible="testVisible" :flowData="flowData" @loadFlow="loadFlow" />
@@ -116,11 +116,11 @@
   // 画布Ref
   const flowAreaRef = ref();
 
-  // 快捷键大全Ref
-  const shortcutModalRef = ref();
-
   // 设置弹窗显隐
   const settingVisible = ref<boolean>(false);
+
+  // 快捷键弹窗显隐
+  const shortcutVisible = ref<boolean>(false);
 
   // 测试弹窗显隐
   const testVisible = ref<boolean>(false);
@@ -472,7 +472,7 @@
 
   // 快捷键大全
   function shortcutHelper() {
-    shortcutModalRef.value.open();
+    shortcutVisible.value = true;
   }
 
   onMounted(() => {

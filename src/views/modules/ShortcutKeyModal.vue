@@ -2,7 +2,7 @@
   <a-modal
     title="快捷键大全"
     width="600px"
-    :visible="modalVisible"
+    :visible="shortcutVisible"
     wrapClassName="shortcutModal"
     :footer="null"
     @cancel="close"
@@ -18,11 +18,18 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import { flowConfig } from '/@/config/args-config';
   import { IShortcutKey } from '/@/type/index';
 
-  const modalVisible = ref<boolean>(false);
+  const props = defineProps({
+    shortcutVisible: {
+      type: Boolean,
+      default: false,
+    },
+  });
+
+  const emits = defineEmits(['update:shortcutVisible']);
 
   const columns = ref([
     {
@@ -43,17 +50,18 @@
 
   const dataSource = ref<IShortcutKey[]>([]);
 
-  function open() {
-    modalVisible.value = true;
-    dataSource.value = Object.values(flowConfig.shortcut);
-  }
-
   function close() {
-    modalVisible.value = false;
-    dataSource.value = [];
+    emits('update:shortcutVisible', false);
   }
 
-  defineExpose({
-    open,
-  });
+  watch(
+    () => props.shortcutVisible,
+    (visible) => {
+      if (visible) {
+        dataSource.value = Object.values(flowConfig.shortcut);
+      } else {
+        dataSource.value = [];
+      }
+    },
+  );
 </script>

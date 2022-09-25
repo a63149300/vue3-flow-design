@@ -179,14 +179,7 @@
           source: link.sourceId,
           target: link.targetId,
           anchor: flowConfig.jsPlumbConfig.anchor.default,
-          connector: [
-            link.cls.linkType,
-            {
-              gap: 5,
-              cornerRadius: 8,
-              alwaysRespectStubs: true,
-            },
-          ],
+          connector: [link.cls.linkType, flowConfig.jsPlumbInsConfig.Connector[1]],
           paintStyle: {
             stroke: link.cls.linkColor,
             strokeWidth: link.cls.linkThickness,
@@ -212,8 +205,8 @@
           link_dom?.removeEventListener('click', labelHandle);
         }
       });
-      currentSelect.value = undefined;
-      currentSelectGroup.value = [];
+
+      clearSelect();
       flowData.status = flowConfig.flowStatus.MODIFY;
     }, true);
 
@@ -276,7 +269,7 @@
 
       document.querySelector('#' + id)?.addEventListener('click', (e: Event) => {
         e.stopPropagation();
-        currentSelect.value = flowData.linkList.find((l: Recordable) => l.id === id);
+        currentSelect.value = flowData.linkList.find((l: ILink) => l.id === id);
       });
 
       if (flowData.status !== flowConfig.flowStatus.LOADING) flowData.linkList.push(o);
@@ -345,8 +338,7 @@
       }
     });
 
-    currentSelect.value = undefined;
-    currentSelectGroup.value = [];
+    clearSelect();
   }
 
   // 检测流程数据有效性
@@ -374,16 +366,6 @@
   function setDragInfo(info: IDragInfo) {
     dragInfo.type = info.type;
     dragInfo.belongTo = info.belongTo;
-  }
-
-  // 关闭提示
-  function listenPage() {
-    window.onbeforeunload = function (e: BeforeUnloadEvent) {
-      if (e) {
-        e.returnValue = '关闭提示';
-      }
-      return '关闭提示';
-    };
   }
 
   // 删除线
@@ -422,23 +404,23 @@
         isX = false;
     }
 
-    if (currentSelectGroup.value.length > 0) {
-      currentSelectGroup.value.forEach((node) => {
+    if (unref(currentSelectGroup).length > 0) {
+      unref(currentSelectGroup).forEach((node) => {
         if (isX) {
           node.x += m;
         } else {
           node.y += m;
         }
       });
-      unref(plumb).repaintEverything();
     } else if (unref(currentSelect)?.id) {
       if (isX) {
-        (currentSelect.value as INode)!.x += m;
+        (unref(currentSelect) as INode).x += m;
       } else {
-        (currentSelect.value as INode)!.y += m;
+        (unref(currentSelect) as INode).y += m;
       }
-      unref(plumb).repaintEverything();
     }
+
+    unref(plumb).repaintEverything();
   }
 
   // 清除画布
@@ -446,10 +428,14 @@
     flowData.nodeList.forEach((node: INode) => {
       unref(plumb).remove(node.id);
     });
-    currentSelect.value = undefined;
-    currentSelectGroup.value = [];
+    clearSelect();
     flowData.nodeList = [];
     flowData.linkList = [];
+  }
+
+  function clearSelect() {
+    currentSelect.value = undefined;
+    currentSelectGroup.value = [];
   }
 
   // 显示隐藏网格
@@ -489,8 +475,5 @@
 
     // 初始化流程图
     initFlow();
-
-    // 关闭提示
-    listenPage();
   });
 </script>

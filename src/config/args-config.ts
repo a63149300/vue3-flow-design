@@ -62,7 +62,7 @@ export const flowConfig = {
     dragOpacity: 0.7,
     alignGridPX: [5, 5],
     alignSpacing: {
-      level: 100,
+      horizontal: 100,
       vertical: 100,
     },
     alignDuration: 300,

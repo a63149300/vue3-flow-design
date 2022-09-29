@@ -478,19 +478,19 @@
             },
             {
               handler: () => {
-                levelUp();
+                horizontalUp();
               },
               label: '水平上对齐',
             },
             {
               handler: () => {
-                levelCenter();
+                horizontalCenter();
               },
               label: '水平居中',
             },
             {
               handler: () => {
-                levelDown();
+                horizontalDown();
               },
               label: '水平下对齐',
             },
@@ -650,14 +650,14 @@
   }
 
   // 水平上对齐
-  function levelUp() {
+  function horizontalUp() {
     if (!checkAlign()) return;
     let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
     let baseX = selectGroup[0].x;
     let baseY = selectGroup[0].y;
     for (let i = 1; i < selectGroup.length; i++) {
-      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.level;
+      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.horizontal;
       let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
@@ -676,7 +676,7 @@
   }
 
   // 水平居中
-  function levelCenter() {
+  function horizontalCenter() {
     if (!checkAlign()) return;
     let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
@@ -685,7 +685,7 @@
     let firstY = baseY;
     for (let i = 1; i < selectGroup.length; i++) {
       baseY = firstY + utils.div(selectGroup[0].height, 2) - utils.div(selectGroup[i].height, 2);
-      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.level;
+      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.horizontal;
       let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;
@@ -704,7 +704,7 @@
   }
 
   // 水平下对齐
-  function levelDown() {
+  function horizontalDown() {
     if (!checkAlign()) return;
     let nodeList = unref(flowData).nodeList;
     let selectGroup = currentSelectGroup.value;
@@ -713,7 +713,7 @@
     let firstY = baseY;
     for (let i = 1; i < selectGroup.length; i++) {
       baseY = firstY + selectGroup[0].height - selectGroup[i].height;
-      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.level;
+      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.horizontal;
       let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
       f.tx = baseX;
       f.ty = baseY;

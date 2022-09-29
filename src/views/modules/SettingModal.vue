@@ -92,7 +92,7 @@
           :min="10"
           :max="800"
           :step="5"
-          v-model:value="flowConfig.defaultStyle.alignSpacing.level"
+          v-model:value="flowConfig.defaultStyle.alignSpacing.horizontal"
         />
       </a-form-item>
       <a-form-item

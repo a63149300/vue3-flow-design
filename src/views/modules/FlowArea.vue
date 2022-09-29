@@ -1,5 +1,5 @@
 <template>
-  <div class="flow-area" @dragover="allowDrop" @drop="drop">
+  <div class="flow-area" @dragover="handleDragover" @drop="handleDrop">
     <!--辅助线X-->
     <div
       v-if="container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowXLine"
@@ -17,7 +17,6 @@
       class="flow-area__container"
       :class="{
         grid: flowData.config.showGrid,
-        canScale: container.scaleFlag,
         canDrag: container.dragFlag,
         canMultiple: rectangleMultiple.flag,
       }"
@@ -203,7 +202,7 @@
     };
   });
 
-  function allowDrop(e: MouseEvent) {
+  function handleDragover(e: MouseEvent) {
     e.preventDefault();
     mousemoveHandler(e);
   }
@@ -237,7 +236,7 @@
   }
 
   // 组件拖拽入画布
-  function drop() {
+  function handleDrop() {
     // 复位拖拽工具
     emits('selectTool', ToolsTypeEnum.DRAG);
 

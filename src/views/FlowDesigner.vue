@@ -28,8 +28,8 @@
         <flow-area
           ref="flowAreaRef"
           :dragInfo="dragInfo"
-          v-model:data="flowData"
           :config="flowConfig"
+          v-model:data="flowData"
           v-model:select="currentSelect"
           v-model:selectGroup="currentSelectGroup"
           :plumb="plumb"

@@ -81,6 +81,7 @@
   import { CommonNodeTypeEnum, LaneNodeTypeEnum, ToolsTypeEnum, NodeTypeEnum } from '/@/type/enums';
   import { INode, ILink, ITool, IDragInfo, IElement } from '/@/type/index';
   import { commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
+  import { useAlign } from '/@/hooks/useAlign';
 
   const props = defineProps({
     data: {
@@ -112,6 +113,15 @@
       default: () => ({}),
     },
   });
+
+  const {
+    verticaLeft,
+    verticalCenter,
+    verticalRight,
+    horizontalUp,
+    horizontalCenter,
+    horizontalDown,
+  } = useAlign();
 
   // 流程配置
   const flowConfig = reactive(props.config);
@@ -460,37 +470,67 @@
           children: [
             {
               handler: () => {
-                verticaLeft();
+                verticaLeft({
+                  currentSelectGroup: props.selectGroup,
+                  flowData: props.data,
+                  flowConfig: props.config,
+                  plumb: props.plumb,
+                });
               },
               label: '垂直左对齐',
             },
             {
               handler: () => {
-                verticalCenter();
+                verticalCenter({
+                  currentSelectGroup: props.selectGroup,
+                  flowData: props.data,
+                  flowConfig: props.config,
+                  plumb: props.plumb,
+                });
               },
               label: '垂直居中',
             },
             {
               handler: () => {
-                verticalRight();
+                verticalRight({
+                  currentSelectGroup: props.selectGroup,
+                  flowData: props.data,
+                  flowConfig: props.config,
+                  plumb: props.plumb,
+                });
               },
               label: '垂直右对齐',
             },
             {
               handler: () => {
-                horizontalUp();
+                horizontalUp({
+                  currentSelectGroup: props.selectGroup,
+                  flowData: props.data,
+                  flowConfig: props.config,
+                  plumb: props.plumb,
+                });
               },
               label: '水平上对齐',
             },
             {
               handler: () => {
-                horizontalCenter();
+                horizontalCenter({
+                  currentSelectGroup: props.selectGroup,
+                  flowData: props.data,
+                  flowConfig: props.config,
+                  plumb: props.plumb,
+                });
               },
               label: '水平居中',
             },
             {
               handler: () => {
-                horizontalDown();
+                horizontalDown({
+                  currentSelectGroup: props.selectGroup,
+                  flowData: props.data,
+                  flowConfig: props.config,
+                  plumb: props.plumb,
+                });
               },
               label: '水平下对齐',
             },
@@ -558,179 +598,6 @@
     emits('saveFlow');
   }
 
-  // 节点排列前校验节点数量
-  function checkAlign() {
-    if (currentSelectGroup.value.length < 2) {
-      message.error('请选择至少两个节点！');
-      return false;
-    }
-    return true;
-  }
-
-  // 垂直左对齐
-  function verticaLeft() {
-    if (!checkAlign()) return;
-    let nodeList = unref(flowData).nodeList;
-    let selectGroup = currentSelectGroup.value;
-    let baseX = selectGroup[0].x;
-    let baseY = selectGroup[0].y;
-    for (let i = 1; i < selectGroup.length; i++) {
-      baseY = baseY + selectGroup[i - 1].height + flowConfig.defaultStyle.alignSpacing.vertical;
-      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
-      f.tx = baseX;
-      f.ty = baseY;
-      props.plumb.animate(
-        selectGroup[i].id,
-        { top: baseY, left: baseX },
-        {
-          duration: flowConfig.defaultStyle.alignDuration,
-          complete: function () {
-            f.x = f.tx;
-            f.y = f.ty;
-          },
-        },
-      );
-    }
-  }
-
-  // 垂直居中
-  function verticalCenter() {
-    if (!checkAlign()) return;
-    let nodeList = unref(flowData).nodeList;
-    let selectGroup = currentSelectGroup.value;
-    let baseX = selectGroup[0].x;
-    let baseY = selectGroup[0].y;
-    let firstX = baseX;
-    for (let i = 1; i < selectGroup.length; i++) {
-      baseY = baseY + selectGroup[i - 1].height + flowConfig.defaultStyle.alignSpacing.vertical;
-      baseX = firstX + utils.div(selectGroup[0].width, 2) - utils.div(selectGroup[i].width, 2);
-      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
-      f.tx = baseX;
-      f.ty = baseY;
-      props.plumb.animate(
-        selectGroup[i].id,
-        { top: baseY, left: baseX },
-        {
-          duration: flowConfig.defaultStyle.alignDuration,
-          complete: function () {
-            f.x = f.tx;
-            f.y = f.ty;
-          },
-        },
-      );
-    }
-  }
-
-  // 垂直右对齐
-  function verticalRight() {
-    if (!checkAlign()) return;
-    let nodeList = unref(flowData).nodeList;
-    let selectGroup = currentSelectGroup.value;
-    let baseX = selectGroup[0].x;
-    let baseY = selectGroup[0].y;
-    let firstX = baseX;
-    for (let i = 1; i < selectGroup.length; i++) {
-      baseY = baseY + selectGroup[i - 1].height + flowConfig.defaultStyle.alignSpacing.vertical;
-      baseX = firstX + selectGroup[0].width - selectGroup[i].width;
-      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
-      f.tx = baseX;
-      f.ty = baseY;
-      props.plumb.animate(
-        selectGroup[i].id,
-        { top: baseY, left: baseX },
-        {
-          duration: flowConfig.defaultStyle.alignDuration,
-          complete: function () {
-            f.x = f.tx;
-            f.y = f.ty;
-          },
-        },
-      );
-    }
-  }
-
-  // 水平上对齐
-  function horizontalUp() {
-    if (!checkAlign()) return;
-    let nodeList = unref(flowData).nodeList;
-    let selectGroup = currentSelectGroup.value;
-    let baseX = selectGroup[0].x;
-    let baseY = selectGroup[0].y;
-    for (let i = 1; i < selectGroup.length; i++) {
-      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.horizontal;
-      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
-      f.tx = baseX;
-      f.ty = baseY;
-      props.plumb.animate(
-        selectGroup[i].id,
-        { top: baseY, left: baseX },
-        {
-          duration: flowConfig.defaultStyle.alignDuration,
-          complete: function () {
-            f.x = f.tx;
-            f.y = f.ty;
-          },
-        },
-      );
-    }
-  }
-
-  // 水平居中
-  function horizontalCenter() {
-    if (!checkAlign()) return;
-    let nodeList = unref(flowData).nodeList;
-    let selectGroup = currentSelectGroup.value;
-    let baseX = selectGroup[0].x;
-    let baseY = selectGroup[0].y;
-    let firstY = baseY;
-    for (let i = 1; i < selectGroup.length; i++) {
-      baseY = firstY + utils.div(selectGroup[0].height, 2) - utils.div(selectGroup[i].height, 2);
-      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.horizontal;
-      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
-      f.tx = baseX;
-      f.ty = baseY;
-      props.plumb.animate(
-        selectGroup[i].id,
-        { top: baseY, left: baseX },
-        {
-          duration: flowConfig.defaultStyle.alignDuration,
-          complete: function () {
-            f.x = f.tx;
-            f.y = f.ty;
-          },
-        },
-      );
-    }
-  }
-
-  // 水平下对齐
-  function horizontalDown() {
-    if (!checkAlign()) return;
-    let nodeList = unref(flowData).nodeList;
-    let selectGroup = currentSelectGroup.value;
-    let baseX = selectGroup[0].x;
-    let baseY = selectGroup[0].y;
-    let firstY = baseY;
-    for (let i = 1; i < selectGroup.length; i++) {
-      baseY = firstY + selectGroup[0].height - selectGroup[i].height;
-      baseX = baseX + selectGroup[i - 1].width + flowConfig.defaultStyle.alignSpacing.horizontal;
-      let f = nodeList.find((n: INode) => n.id === selectGroup[i].id);
-      f.tx = baseX;
-      f.ty = baseY;
-      props.plumb.animate(
-        selectGroup[i].id,
-        { top: baseY, left: baseX },
-        {
-          duration: flowConfig.defaultStyle.alignDuration,
-          complete: function () {
-            f.x = f.tx;
-            f.y = f.ty;
-          },
-        },
-      );
-    }
-  }
-
   // 复制节点
   function copyNode() {
     clipboard = [];
@@ -790,7 +657,7 @@
   function containerHandler() {
     selectContainer();
   }
-  // 清除面布已选内容
+  // 清除画布已选内容
   function selectContainer() {
     currentSelect.value = {} as INode | ILink;
     // 开启快捷键

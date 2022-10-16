@@ -108,3 +108,19 @@ export const utils = {
     );
   },
 };
+
+// 设置流程配置
+export function setFlowConfig(config, settingConfig) {
+  // 画布
+  config.defaultStyle.containerScale.onceNarrow = settingConfig.containerScale.onceNarrow;
+  config.defaultStyle.containerScale.onceEnlarge = settingConfig.containerScale.onceEnlarge;
+  // 连线
+  config.jsPlumbInsConfig.Connector[0] = settingConfig.cls.linkType;
+  config.jsPlumbInsConfig.PaintStyle.stroke = settingConfig.cls.linkColor;
+  config.jsPlumbInsConfig.PaintStyle.strokeWidth = settingConfig.cls.linkThickness;
+  // 其它设置
+  config.defaultStyle.isOpenAuxiliaryLine = settingConfig.other.isOpenAuxiliaryLine;
+  config.defaultStyle.alignSpacing.horizontal = settingConfig.other.horizontal;
+  config.defaultStyle.alignSpacing.vertical = settingConfig.other.vertical;
+  config.defaultStyle.movePx = settingConfig.other.movePx;
+}

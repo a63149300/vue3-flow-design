@@ -1,7 +1,7 @@
 <template>
   <a-drawer title="测试" placement="right" :width="600" :visible="testVisible" @close="onClose">
     <div>当前的flowData:</div>
-    <json-viewer :value="flowData" :expand-depth="3" boxed copyable />
+    <json-viewer :value="flowData" :expand-depth="3" boxed copyable v-if="testVisible" />
 
     <div style="margin-top: 16px">暂存:</div>
     <a-textarea

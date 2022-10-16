@@ -13,6 +13,7 @@
     "canvg": "^2.0.0",
     "html2canvas": "^1.4.1",
     "jsplumb": "^2.15.6",
+    "lodash-es": "^4.17.21",
     "resizable-dom": "^1.0.2",
     "vue": "^3.2.37",
     "vue-lsp": "^1.0.2",

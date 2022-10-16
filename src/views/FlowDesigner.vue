@@ -89,11 +89,12 @@
   import { tools } from '/@/config/basic-node-config';
   import { IDragInfo, INode, ILink, ITool } from '/@/type/index';
   import { ToolsTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
-  import { utils } from '/@/utils/common';
+  import { utils, setFlowConfig } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { useGenerateFlowImage } from '/@/hooks/useGenerateFlowImage';
   import { useShortcutKey } from '/@/hooks/useShortcutKey';
-  import { flowConfig as defaultFlowConfig } from '/@/config/args-config';
+  import { flowConfig as defaultFlowConfig, settingConfig } from '/@/config/args-config';
+  import { ls } from 'vue-lsp';
 
   const [createContextMenu] = useContextMenu();
 
@@ -461,6 +462,15 @@
     shortcutVisible.value = true;
   }
 
+  // 初始画布设置
+  async function initSettingConfig() {
+    if (!ls.get('settingConfig')) {
+      ls.set('settingConfig', settingConfig);
+    } else {
+      setFlowConfig(flowConfig, ls.get('settingConfig'));
+    }
+  }
+
   onMounted(() => {
     // 实例化JsPlumb
     initJsPlumb();
@@ -472,6 +482,9 @@
       saveFlow,
       openTest,
     });
+
+    // 初始画布设置
+    initSettingConfig();
 
     // 初始化流程图
     initFlow();

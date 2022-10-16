@@ -1,7 +1,25 @@
+export const settingConfig = {
+  containerScale: {
+    onceNarrow: 0.1,
+    onceEnlarge: 0.1,
+  },
+  cls: {
+    linkType: 'Flowchart',
+    linkColor: '#2a2929',
+    linkThickness: 2,
+  },
+  other: {
+    isOpenAuxiliaryLine: true,
+    horizontal: 100,
+    vertical: 100,
+    movePx: 5,
+  },
+};
+
 export const flowConfig = {
   jsPlumbInsConfig: {
     Connector: [
-      'Flowchart',
+      settingConfig.cls.linkType,
       {
         gap: 5,
         cornerRadius: 8,
@@ -19,8 +37,8 @@ export const flowConfig = {
       ],
     ],
     PaintStyle: {
-      stroke: '#2a2929',
-      strokeWidth: 2,
+      stroke: settingConfig.cls.linkColor,
+      strokeWidth: settingConfig.cls.linkThickness,
     },
     HoverPaintStyle: {
       stroke: '#409EFF',
@@ -62,20 +80,20 @@ export const flowConfig = {
     dragOpacity: 0.7,
     alignGridPX: [5, 5],
     alignSpacing: {
-      horizontal: 100,
-      vertical: 100,
+      horizontal: settingConfig.other.horizontal,
+      vertical: settingConfig.other.vertical,
     },
     alignDuration: 300,
     containerScale: {
       init: 1,
       min: 0.5,
       max: 3,
-      onceNarrow: 0.1,
-      onceEnlarge: 0.1,
+      onceNarrow: settingConfig.containerScale.onceNarrow,
+      onceEnlarge: settingConfig.containerScale.onceEnlarge,
     },
-    isOpenAuxiliaryLine: true,
+    isOpenAuxiliaryLine: settingConfig.other.isOpenAuxiliaryLine,
     showAuxiliaryLineDistance: 20,
-    movePx: 5,
+    movePx: settingConfig.other.movePx,
     photoBlankDistance: 200,
   },
   // ID的生成类型。1.uuid uuid 2.time_stamp 时间戳 3.sequence 序列 4.time_stamp_and_sequence 时间戳加序列 5.custom 自定义

@@ -6,6 +6,8 @@ import {
   LaneNodeTypeEnum,
 } from './enums';
 
+import { settingConfig } from '../config/args-config';
+
 export type NodesType = CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum;
 
 export interface IDragInfo {
@@ -54,3 +56,5 @@ export interface IShortcutKey {
   codeName: string;
   shortcutName: string;
 }
+
+export type ISettingConfig = typeof settingConfig;

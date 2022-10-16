@@ -152,14 +152,17 @@
     'showNodeContextMenu',
   ]);
 
+  // 流程配置
   const flowConfig = reactive(props.config);
 
   // 当前节点信息
   const currentNode = reactive(props.node);
 
-  let currentSelect = ref(props.select);
+  // 当前选择的节点
+  const currentSelect = ref(props.select);
 
-  let currentSelectGroup = ref(props.selectGroup);
+  // 当前选择的节点组
+  const currentSelectGroup = ref(props.selectGroup);
 
   // 设置ICON
   function setIcon(type: NodesType) {
@@ -174,6 +177,7 @@
         return 'ToolOutlined';
     }
   }
+
   // 设置鼠标样式
   function setCursor(type: ToolsTypeEnum) {
     switch (type) {
@@ -190,14 +194,17 @@
   function registerNode() {
     props?.plumb?.draggable(currentNode.id, {
       containment: 'parent',
-      handle: (e, el) => {
+      handle: (e, el: HTMLElement) => {
         // 判断节点类型
-        let possibles = el.parentNode.querySelectorAll(
-          '.common-circle-node,.common-rectangle-node,.common-diamond-node,.lane-text-div',
-        );
-        for (let i = 0; i < possibles.length; i++) {
-          if (possibles[i] === el || e.target.className === 'lane-text') return true;
+        let possibles =
+          el?.parentNode?.querySelectorAll(
+            '.common-circle-node,.common-rectangle-node,.common-diamond-node,.lane-text-div',
+          ) ?? [];
+
+        for (let i = 0; i < possibles?.length; i++) {
+          if (possibles[i] === el || e?.target?.className === 'lane-text') return true;
         }
+
         return false;
       },
       grid: flowConfig.defaultStyle.alignGridPX,
@@ -245,6 +252,7 @@
     currentSelect.value = currentNode;
     currentSelectGroup.value = [];
   }
+
   // 点击节点
   function selectNode() {
     currentSelect.value = currentNode;

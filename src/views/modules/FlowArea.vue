@@ -6,12 +6,14 @@
       class="flow-area__lineX"
       :style="{ top: auxiliaryLinePos.y + 'px' }"
     ></div>
+
     <!--辅助线Y-->
     <div
       v-if="container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowYLine"
       class="flow-area__lineY"
       :style="{ left: auxiliaryLinePos.x + 'px' }"
     ></div>
+
     <div
       id="flowContainer"
       class="flow-area__container"
@@ -114,21 +116,6 @@
     },
   });
 
-  const {
-    verticaLeft,
-    verticalCenter,
-    verticalRight,
-    horizontalUp,
-    horizontalCenter,
-    horizontalDown,
-  } = useAlign();
-
-  // 流程配置
-  const flowConfig = reactive(props.config);
-
-  // 流程DSL数据
-  const flowData = ref(props.data);
-
   const emits = defineEmits([
     'selectTool',
     'onShortcutKey',
@@ -138,10 +125,27 @@
     'update:data',
   ]);
 
+  const {
+    verticaLeft,
+    verticalCenter,
+    verticalRight,
+    horizontalUp,
+    horizontalCenter,
+    horizontalDown,
+  } = useAlign();
+
   const [createContextMenu] = useContextMenu();
 
+  // 流程配置
+  const flowConfig = reactive(props.config);
+
+  // 流程DSL数据
+  const flowData = ref(props.data);
+
+  // 当前选择的节点
   const currentSelect = ref(props.select);
 
+  // 当前选择的节点组
   const currentSelectGroup = ref(props.selectGroup);
 
   const container = reactive({

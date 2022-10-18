@@ -78,6 +78,7 @@
   import { jsPlumb, Defaults } from 'jsplumb';
   import { reactive, ref, onMounted, nextTick, unref } from 'vue';
   import { message } from 'ant-design-vue';
+  import { ls } from 'vue-lsp';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
   import SettingModal from './modules/SettingModal.vue';
@@ -94,7 +95,6 @@
   import { useGenerateFlowImage } from '/@/hooks/useGenerateFlowImage';
   import { useShortcutKey } from '/@/hooks/useShortcutKey';
   import { flowConfig as defaultFlowConfig, settingConfig } from '/@/config/args-config';
-  import { ls } from 'vue-lsp';
 
   const [createContextMenu] = useContextMenu();
 

@@ -54,10 +54,10 @@ export function useGenerateFlowImage() {
   }
 
   // 生成流程图片
-  function generateFlowImage(flowAreaRef, nodeList, photoBlankDistance, checkFlow) {
+  function generateFlowImage(nodeList, photoBlankDistance, checkFlow) {
     if (!checkFlow()) return;
 
-    const $Container = flowAreaRef.$el.children[0];
+    const $Container = document.querySelector('#flowContainer');
     const svgElems = $Container.querySelectorAll('svg[id^="link-"]');
     const removeArr: string[] = [];
 
@@ -77,6 +77,10 @@ export function useGenerateFlowImage() {
       $Container.appendChild(linkCanvas);
     });
 
+    $Container?.querySelectorAll('svg').forEach((item) => {
+      item.style.display = 'none';
+    });
+
     const canvasSize = computeCanvasSize(nodeList);
 
     const offsetPbd = utils.div(photoBlankDistance, 2);
@@ -91,6 +95,10 @@ export function useGenerateFlowImage() {
         removeArr.forEach((id) => {
           const currentNode = document.querySelector('#' + id);
           currentNode?.parentNode?.removeChild(currentNode);
+        });
+
+        $Container?.querySelectorAll('svg').forEach((item) => {
+          item.style.display = 'inline-block';
         });
       },
     }).then((canvas) => {

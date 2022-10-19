@@ -9,7 +9,6 @@
         :flowData="flowData"
         @generateFlowImage="
           generateFlowImage(
-            flowAreaRef,
             flowData.nodeList,
             flowConfig.defaultStyle.photoBlankDistance,
             checkFlow,

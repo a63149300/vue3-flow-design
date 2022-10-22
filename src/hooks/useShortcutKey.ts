@@ -1,4 +1,5 @@
 import { ToolsTypeEnum } from '/@/type/enums';
+import { shortcutKeys } from '/@/config/args-config';
 
 export function useShortcutKey() {
   // 画布聚焦开启快捷键
@@ -12,39 +13,39 @@ export function useShortcutKey() {
       const key = e.code;
 
       switch (key) {
-        case flowConfig.shortcut.multiple.code.split(',')[0]:
-        case flowConfig.shortcut.multiple.code.split(',')[1]:
+        case shortcutKeys.multiple.code.split(',')[0]:
+        case shortcutKeys.multiple.code.split(',')[1]:
           flowAreaRef.rectangleMultiple.flag = true;
           break;
-        case flowConfig.shortcut.dragContainer.code:
+        case shortcutKeys.dragContainer.code:
           flowAreaRef.container.dragFlag = true;
           break;
-        case flowConfig.shortcut.dragTool.code:
+        case shortcutKeys.dragTool.code:
           handler.selectTool(ToolsTypeEnum.DRAG);
           break;
-        case flowConfig.shortcut.connTool.code:
+        case shortcutKeys.connTool.code:
           handler.selectTool(ToolsTypeEnum.CONNECTION);
           break;
-        case flowConfig.shortcut.leftMove.code:
+        case shortcutKeys.leftMove.code:
           handler.moveNode('left');
           break;
-        case flowConfig.shortcut.upMove.code:
+        case shortcutKeys.upMove.code:
           handler.moveNode('up');
           break;
-        case flowConfig.shortcut.rightMove.code:
+        case shortcutKeys.rightMove.code:
           handler.moveNode('right');
           break;
-        case flowConfig.shortcut.downMove.code:
+        case shortcutKeys.downMove.code:
           handler.moveNode('down');
           break;
       }
 
       if (e.ctrlKey) {
         switch (key) {
-          case flowConfig.shortcut.settingModal.code:
+          case shortcutKeys.settingModal.code:
             handler.saveFlow();
             break;
-          case flowConfig.shortcut.testModal.code:
+          case shortcutKeys.testModal.code:
             handler.openTest();
             break;
         }
@@ -53,9 +54,9 @@ export function useShortcutKey() {
     // 拖拽、多选快捷键复位
     document.onkeyup = (event: KeyboardEvent) => {
       const key = event.code;
-      if (key === flowConfig.shortcut.dragContainer.code) {
+      if (key === shortcutKeys.dragContainer.code) {
         flowAreaRef.container.dragFlag = false;
-      } else if (flowConfig.shortcut.multiple.code.includes(key)) {
+      } else if (shortcutKeys.multiple.code.includes(key)) {
         flowAreaRef.rectangleMultiple.flag = false;
       }
     };

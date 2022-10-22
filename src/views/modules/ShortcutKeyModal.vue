@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
   import { ref, watch } from 'vue';
-  import { flowConfig } from '/@/config/args-config';
+  import { shortcutKeys } from '/@/config/args-config';
   import { IShortcutKey } from '/@/type/index';
 
   const props = defineProps({
@@ -58,7 +58,7 @@
     () => props.shortcutVisible,
     (visible) => {
       if (visible) {
-        dataSource.value = Object.values(flowConfig.shortcut);
+        dataSource.value = Object.values(shortcutKeys);
       } else {
         dataSource.value = [];
       }

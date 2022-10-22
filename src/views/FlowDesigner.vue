@@ -210,7 +210,7 @@
       flowData.status = flowConfig.flowStatus.MODIFY;
     }, true);
 
-    flowAreaRef.value.container.pos = {
+    unref(flowAreaRef).container.pos = {
       top: 0,
       left: 0,
     };

@@ -18,7 +18,6 @@ const ICON_LIST = [
   'ToolOutlined',
   'BookOutlined',
   'SaveOutlined',
-  'SaveOutlined',
   'ZoomInOutlined',
   'ZoomOutOutlined',
   'ClusterOutlined',

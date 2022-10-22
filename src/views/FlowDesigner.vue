@@ -52,8 +52,8 @@
     :title="'流程设计图_' + flowData.attr.id + '.png'"
     centered
     width="90%"
-    :closable="flowImage.closable"
-    :maskClosable="flowImage.maskClosable"
+    :closable="false"
+    :maskClosable="false"
     :visible="flowImage.modalVisible"
     okText="下载到本地"
     cancelText="取消"

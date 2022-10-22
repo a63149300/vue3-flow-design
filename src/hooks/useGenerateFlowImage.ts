@@ -8,8 +8,6 @@ export function useGenerateFlowImage() {
   const flowImage = reactive({
     url: '',
     modalVisible: false,
-    closable: false,
-    maskClosable: false,
   });
 
   // 下载图片
@@ -68,6 +66,7 @@ export function useGenerateFlowImage() {
       removeArr.push(canvasId);
 
       const svgContent = svgElem.outerHTML.trim();
+      // svg生成canvas
       canvg(linkCanvas, svgContent);
       if (svgElem.style.position) {
         linkCanvas.style.position += svgElem.style.position;
@@ -77,7 +76,8 @@ export function useGenerateFlowImage() {
       $Container.appendChild(linkCanvas);
     });
 
-    $Container?.querySelectorAll('svg').forEach((item) => {
+    // 先将画布的SVG隐藏，避免生成断截的线条
+    $Container?.querySelectorAll('svg[id^="link-"]').forEach((item) => {
       item.style.display = 'none';
     });
 
@@ -92,12 +92,14 @@ export function useGenerateFlowImage() {
       scrollY: 0,
       logging: false,
       onclone: () => {
+        // 删除生成的canvas
         removeArr.forEach((id) => {
           const currentNode = document.querySelector('#' + id);
           currentNode?.parentNode?.removeChild(currentNode);
         });
 
-        $Container?.querySelectorAll('svg').forEach((item) => {
+        // 显示隐藏的sv
+        $Container?.querySelectorAll('svg[id^="link-"]').forEach((item) => {
           item.style.display = 'inline-block';
         });
       },

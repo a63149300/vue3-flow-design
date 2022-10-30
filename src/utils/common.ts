@@ -123,4 +123,6 @@ export function setFlowConfig(config, settingConfig) {
   config.defaultStyle.alignSpacing.horizontal = settingConfig.other.horizontal;
   config.defaultStyle.alignSpacing.vertical = settingConfig.other.vertical;
   config.defaultStyle.movePx = settingConfig.other.movePx;
+
+  return config;
 }

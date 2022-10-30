@@ -6,7 +6,7 @@ export function useShortcutKey() {
   let activeShortcutKey = true;
 
   // 初始化快捷键
-  function listenShortcutKey(flowConfig, flowAreaRef, handler) {
+  function listenShortcutKey(flowAreaRef, handler) {
     document.onkeydown = (e: KeyboardEvent) => {
       // 画布聚焦开启快捷键
       if (!activeShortcutKey) return;

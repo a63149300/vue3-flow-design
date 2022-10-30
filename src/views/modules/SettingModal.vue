@@ -169,7 +169,7 @@
 
   function handleSubmit() {
     ls.set('settingConfig', unref(settingConfig));
-    setFlowConfig(unref(flowConfig), unref(settingConfig));
+    flowConfig.value = setFlowConfig(unref(flowConfig), unref(settingConfig));
     close();
     message.success('设置成功');
   }

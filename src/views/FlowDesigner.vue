@@ -77,6 +77,7 @@
   import { jsPlumb, Defaults } from 'jsplumb';
   import { reactive, ref, onMounted, nextTick, unref } from 'vue';
   import { message } from 'ant-design-vue';
+  import { cloneDeep } from 'lodash-es';
   import { ls } from 'vue-lsp';
   import FlowArea from './modules/FlowArea.vue';
   import FlowAttr from './modules/FlowAttr.vue';
@@ -105,7 +106,7 @@
   const { listenShortcutKey, offShortcutKey, onShortcutKey } = useShortcutKey();
 
   // 流程配置
-  const flowConfig = reactive(defaultFlowConfig);
+  const flowConfig = ref(cloneDeep(defaultFlowConfig));
 
   // 流程实例
   const plumb = ref();
@@ -137,7 +138,7 @@
       showGridText: '隐藏网格',
       showGridIcon: 'EyeOutlined',
     },
-    status: flowConfig.flowStatus.CREATE,
+    status: unref(flowConfig).flowStatus.CREATE,
   });
 
   // 当前选择节点
@@ -154,7 +155,7 @@
 
   // 初始化流程图
   function initFlow() {
-    if (flowData.status === flowConfig.flowStatus.CREATE) {
+    if (flowData.status === unref(flowConfig).flowStatus.CREATE) {
       flowData.attr.id = 'flow-' + utils.getId();
     } else {
       loadFlow();
@@ -168,7 +169,7 @@
     const loadData = JSON.parse(str);
     flowData.attr = loadData.attr;
     flowData.config = loadData.config;
-    flowData.status = flowConfig.flowStatus.LOADING;
+    flowData.status = unref(flowConfig).flowStatus.LOADING;
     unref(plumb).batch(async () => {
       flowData.nodeList = loadData.nodeList;
       await nextTick();
@@ -178,8 +179,8 @@
         let conn = unref(plumb).connect({
           source: link.sourceId,
           target: link.targetId,
-          anchor: flowConfig.jsPlumbConfig.anchor.default,
-          connector: [link.cls.linkType, flowConfig.jsPlumbInsConfig.Connector[1]],
+          anchor: unref(flowConfig).jsPlumbConfig.anchor.default,
+          connector: [link.cls.linkType, unref(flowConfig).jsPlumbInsConfig.Connector[1]],
           paintStyle: {
             stroke: link.cls.linkColor,
             strokeWidth: link.cls.linkThickness,
@@ -207,7 +208,7 @@
       });
 
       clearSelect();
-      flowData.status = flowConfig.flowStatus.MODIFY;
+      flowData.status = unref(flowConfig).flowStatus.MODIFY;
     }, true);
 
     unref(flowAreaRef).container.pos = {
@@ -218,7 +219,7 @@
 
   // 实例化JsPlumb
   function initJsPlumb() {
-    plumb.value = jsPlumb.getInstance(flowConfig.jsPlumbInsConfig as unknown as Defaults);
+    plumb.value = jsPlumb.getInstance(unref(flowConfig).jsPlumbInsConfig as unknown as Defaults);
 
     unref(plumb).bind('beforeDrop', (info: Recordable) => {
       let sourceId = info.sourceId;
@@ -241,12 +242,12 @@
       let id = '';
       let label = '';
       if (
-        flowData.status === flowConfig.flowStatus.CREATE ||
-        flowData.status === flowConfig.flowStatus.MODIFY
+        flowData.status === unref(flowConfig).flowStatus.CREATE ||
+        flowData.status === unref(flowConfig).flowStatus.MODIFY
       ) {
         id = 'link-' + utils.getId();
         label = '';
-      } else if (flowData.status === flowConfig.flowStatus.LOADING) {
+      } else if (flowData.status === unref(flowConfig).flowStatus.LOADING) {
         let l = flowData.linkList[flowData.linkList.length - 1];
         id = l.id;
         label = l.label;
@@ -258,9 +259,9 @@
       o.targetId = conn.targetId;
       o.label = label;
       o.cls = {
-        linkType: flowConfig.jsPlumbInsConfig.Connector[0],
-        linkColor: flowConfig.jsPlumbInsConfig.PaintStyle.stroke,
-        linkThickness: flowConfig.jsPlumbInsConfig.PaintStyle.strokeWidth,
+        linkType: unref(flowConfig).jsPlumbInsConfig.Connector[0],
+        linkColor: unref(flowConfig).jsPlumbInsConfig.PaintStyle.stroke,
+        linkThickness: unref(flowConfig).jsPlumbInsConfig.PaintStyle.strokeWidth,
       };
       document.querySelector('#' + id)?.addEventListener('contextmenu', (e: Event) => {
         showLinkContextMenu(e);
@@ -272,11 +273,11 @@
         currentSelect.value = flowData.linkList.find((l: ILink) => l.id === id);
       });
 
-      if (flowData.status !== flowConfig.flowStatus.LOADING) flowData.linkList.push(o);
+      if (flowData.status !== unref(flowConfig).flowStatus.LOADING) flowData.linkList.push(o);
     });
 
     unref(plumb).importDefaults({
-      ConnectionsDetachable: flowConfig.jsPlumbConfig.conn.isDetachable,
+      ConnectionsDetachable: unref(flowConfig).jsPlumbConfig.conn.isDetachable,
     });
   }
 
@@ -333,8 +334,8 @@
         unref(plumb).toggleDraggable(node.id);
       }
       if (node.type !== LaneNodeTypeEnum.X_LANE && node.type !== LaneNodeTypeEnum.Y_LANE) {
-        unref(plumb).makeSource(node.id, flowConfig.jsPlumbConfig.makeSourceConfig);
-        unref(plumb).makeTarget(node.id, flowConfig.jsPlumbConfig.makeTargetConfig);
+        unref(plumb).makeSource(node.id, unref(flowConfig).jsPlumbConfig.makeSourceConfig);
+        unref(plumb).makeTarget(node.id, unref(flowConfig).jsPlumbConfig.makeTargetConfig);
       }
     });
 
@@ -357,7 +358,7 @@
     let flowObj = Object.assign({}, flowData);
 
     if (!checkFlow()) return;
-    flowObj.status = flowConfig.flowStatus.SAVE;
+    flowObj.status = unref(flowConfig).flowStatus.SAVE;
     message.success('保存流程成功！请查看控制台。');
     console.log(flowObj);
   }
@@ -388,7 +389,7 @@
 
   // 键盘移动节点
   function moveNode(type: string) {
-    let m = flowConfig.defaultStyle.movePx,
+    let m = unref(flowConfig).defaultStyle.movePx,
       isX = true;
     switch (type) {
       case 'left':
@@ -462,11 +463,11 @@
   }
 
   // 初始画布设置
-  async function initSettingConfig() {
+  function initSettingConfig() {
     if (!ls.get('settingConfig')) {
       ls.set('settingConfig', settingConfig);
     } else {
-      setFlowConfig(flowConfig, ls.get('settingConfig'));
+      flowConfig.value = setFlowConfig(unref(flowConfig), ls.get('settingConfig'));
     }
   }
 
@@ -475,7 +476,7 @@
     initJsPlumb();
 
     // 初始化快捷键
-    listenShortcutKey(flowConfig, unref(flowAreaRef), {
+    listenShortcutKey(unref(flowAreaRef), {
       selectTool,
       moveNode,
       saveFlow,

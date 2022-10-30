@@ -171,11 +171,15 @@
     flowData.config = loadData.config;
     flowData.status = unref(flowConfig).flowStatus.LOADING;
     unref(plumb).batch(async () => {
-      flowData.nodeList = loadData.nodeList;
+      const nodeList = loadData.nodeList;
+      nodeList.forEach((node: INode) => {
+        flowData.nodeList.push(node);
+      });
+
       await nextTick();
-      let linkList = loadData.linkList;
-      flowData.linkList = linkList;
+      const linkList = loadData.linkList;
       linkList.forEach((link: ILink) => {
+        flowData.linkList.push(link);
         let conn = unref(plumb).connect({
           source: link.sourceId,
           target: link.targetId,

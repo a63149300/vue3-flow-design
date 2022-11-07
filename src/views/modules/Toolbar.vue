@@ -86,7 +86,7 @@
   import { PropType } from 'vue';
   import { ITool } from '/@/type/index';
   import { ToolsTypeEnum } from '/@/type/enums';
-  import { tools } from '/@/config/basic-node-config';
+  import { tools } from '/@/config/tools';
 
   defineProps({
     currentTool: {

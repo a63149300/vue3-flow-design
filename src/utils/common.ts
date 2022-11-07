@@ -1,4 +1,4 @@
-import { flowConfig } from '/@/config/args-config';
+import { flowConfig } from '/@/config/flow';
 
 export const utils = {
   seqNo: 1,

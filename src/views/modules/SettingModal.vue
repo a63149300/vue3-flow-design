@@ -124,7 +124,7 @@
   import 'vue3-colorpicker/style.css';
   import { cloneDeep } from 'lodash-es';
   import { ISettingConfig } from '/@/type/index';
-  import { settingConfig as defaultSettingConfig } from '/@/config/args-config';
+  import { settingConfig as defaultSettingConfig } from '/@/config/flow';
   import { setFlowConfig } from '/@/utils/common';
 
   const props = defineProps({

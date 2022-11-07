@@ -6,7 +6,7 @@ import {
   LaneNodeTypeEnum,
 } from './enums';
 
-import { settingConfig } from '../config/args-config';
+import { settingConfig } from '../config/flow';
 
 export type NodesType = CommonNodeTypeEnum | HighNodeTypeEnum | LaneNodeTypeEnum;
 

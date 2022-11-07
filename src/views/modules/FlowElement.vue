@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
   import FlowElementList from './FlowElementList.vue';
-  import { commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
+  import { commonNodes, highNodes, laneNodes } from '/@/config/nodes';
   import { IDragInfo } from '/@/type/index';
   import { NodeTypeEnum } from '/@/type/enums';
 

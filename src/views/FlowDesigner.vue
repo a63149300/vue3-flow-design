@@ -87,14 +87,14 @@
   import FlowElement from './modules/FlowElement.vue';
   import Toolbar from './modules/Toolbar.vue';
   import FlowFooter from './modules/FlowFooter.vue';
-  import { tools } from '/@/config/basic-node-config';
+  import { tools } from '/@/config/tools';
   import { IDragInfo, INode, ILink, ITool } from '/@/type/index';
   import { ToolsTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
   import { utils, setFlowConfig } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { useGenerateFlowImage } from '/@/hooks/useGenerateFlowImage';
   import { useShortcutKey } from '/@/hooks/useShortcutKey';
-  import { flowConfig as defaultFlowConfig, settingConfig } from '/@/config/args-config';
+  import { flowConfig as defaultFlowConfig, settingConfig } from '/@/config/flow';
 
   const [createContextMenu] = useContextMenu();
 

@@ -19,7 +19,7 @@
 <script lang="ts" setup>
   import { ref, unref } from 'vue';
   import { JsonViewer } from 'vue3-json-viewer';
-  import { flowConfig } from '/@/config/args-config';
+  import { flowConfig } from '/@/config/flow';
   import 'vue3-json-viewer/dist/index.css';
   import { ChangeEvent } from 'ant-design-vue/lib/_util/EventInterface';
 

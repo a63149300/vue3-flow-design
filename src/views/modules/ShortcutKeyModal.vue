@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
   import { ref, watch } from 'vue';
-  import { shortcutKeys } from '/@/config/args-config';
+  import { shortcutKeys } from '/@/config/shortcutKeys';
   import { IShortcutKey } from '/@/type/index';
 
   const props = defineProps({

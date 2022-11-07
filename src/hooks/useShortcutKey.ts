@@ -1,5 +1,5 @@
 import { ToolsTypeEnum } from '/@/type/enums';
-import { shortcutKeys } from '/@/config/args-config';
+import { shortcutKeys } from '/@/config/shortcutKeys';
 
 export function useShortcutKey() {
   // 画布聚焦开启快捷键

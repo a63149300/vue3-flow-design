@@ -82,7 +82,7 @@
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { CommonNodeTypeEnum, LaneNodeTypeEnum, ToolsTypeEnum, NodeTypeEnum } from '/@/type/enums';
   import { INode, ILink, ITool, IDragInfo, IElement } from '/@/type/index';
-  import { commonNodes, highNodes, laneNodes } from '/@/config/basic-node-config';
+  import { commonNodes, highNodes, laneNodes } from '/@/config/nodes';
   import { useAlign } from '/@/hooks/useAlign';
 
   const props = defineProps({

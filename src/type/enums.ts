@@ -26,3 +26,10 @@ export enum LaneNodeTypeEnum {
   X_LANE = 'x_lane',
   Y_LANE = 'y_lane',
 }
+
+export enum FlowStatusEnum {
+  CREATE = '0',
+  SAVE = '1',
+  MODIFY = '2',
+  LOADING = '3',
+}

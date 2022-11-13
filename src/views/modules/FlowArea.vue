@@ -80,7 +80,13 @@
   import { utils } from '/@/utils/common';
   import FlowNode from './FlowNode.vue';
   import { useContextMenu } from '/@/hooks/useContextMenu';
-  import { CommonNodeTypeEnum, LaneNodeTypeEnum, ToolsTypeEnum, NodeTypeEnum } from '/@/type/enums';
+  import {
+    CommonNodeTypeEnum,
+    LaneNodeTypeEnum,
+    ToolsTypeEnum,
+    NodeTypeEnum,
+    FlowStatusEnum,
+  } from '/@/type/enums';
   import { INode, ILink, ITool, IDragInfo, IElement } from '/@/type/index';
   import { commonNodes, highNodes, laneNodes } from '/@/config/nodes';
   import { useAlign } from '/@/hooks/useAlign';
@@ -631,7 +637,7 @@
 
     arr.push(Object.assign({}, unref(currentSelect) as INode));
 
-    flowData.value.status = flowConfig.flowStatus.LOADING;
+    flowData.value.status = FlowStatusEnum.LOADING;
 
     arr.forEach((c) => {
       let conns = getConnectionsByNodeId(c.id);
@@ -652,7 +658,7 @@
       let inx = nodeList.findIndex((node: INode) => node.id === c.id);
       nodeList.splice(inx, 1);
     });
-    flowData.value.status = flowConfig.flowStatus.CREATE;
+    flowData.value.status = FlowStatusEnum.CREATE;
     emits('update:data', unref(flowData));
     selectContainer();
   }

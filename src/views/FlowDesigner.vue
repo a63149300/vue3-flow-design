@@ -89,7 +89,7 @@
   import FlowFooter from './modules/FlowFooter.vue';
   import { tools } from '/@/config/tools';
   import { IDragInfo, INode, ILink, ITool } from '/@/type/index';
-  import { ToolsTypeEnum, LaneNodeTypeEnum } from '/@/type/enums';
+  import { ToolsTypeEnum, LaneNodeTypeEnum, FlowStatusEnum } from '/@/type/enums';
   import { utils, setFlowConfig } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { useGenerateFlowImage } from '/@/hooks/useGenerateFlowImage';
@@ -138,7 +138,7 @@
       showGridText: '隐藏网格',
       showGridIcon: 'EyeOutlined',
     },
-    status: unref(flowConfig).flowStatus.CREATE,
+    status: FlowStatusEnum.CREATE,
   });
 
   // 当前选择节点
@@ -155,7 +155,7 @@
 
   // 初始化流程图
   function initFlow() {
-    if (flowData.status === unref(flowConfig).flowStatus.CREATE) {
+    if (flowData.status === FlowStatusEnum.CREATE) {
       flowData.attr.id = 'flow-' + utils.getId();
     } else {
       loadFlow();
@@ -169,7 +169,7 @@
     const loadData = JSON.parse(str);
     flowData.attr = loadData.attr;
     flowData.config = loadData.config;
-    flowData.status = unref(flowConfig).flowStatus.LOADING;
+    flowData.status = FlowStatusEnum.LOADING;
     unref(plumb).batch(async () => {
       const nodeList = loadData.nodeList;
       nodeList.forEach((node: INode) => {
@@ -212,7 +212,7 @@
       });
 
       clearSelect();
-      flowData.status = unref(flowConfig).flowStatus.MODIFY;
+      flowData.status = FlowStatusEnum.MODIFY;
     }, true);
 
     unref(flowAreaRef).container.pos = {
@@ -245,13 +245,10 @@
       let o: Recordable = {};
       let id = '';
       let label = '';
-      if (
-        flowData.status === unref(flowConfig).flowStatus.CREATE ||
-        flowData.status === unref(flowConfig).flowStatus.MODIFY
-      ) {
+      if (flowData.status === FlowStatusEnum.CREATE || flowData.status === FlowStatusEnum.MODIFY) {
         id = 'link-' + utils.getId();
         label = '';
-      } else if (flowData.status === unref(flowConfig).flowStatus.LOADING) {
+      } else if (flowData.status === FlowStatusEnum.LOADING) {
         let l = flowData.linkList[flowData.linkList.length - 1];
         id = l.id;
         label = l.label;
@@ -277,7 +274,7 @@
         currentSelect.value = flowData.linkList.find((l: ILink) => l.id === id);
       });
 
-      if (flowData.status !== unref(flowConfig).flowStatus.LOADING) flowData.linkList.push(o);
+      if (flowData.status !== FlowStatusEnum.LOADING) flowData.linkList.push(o);
     });
 
     unref(plumb).importDefaults({
@@ -362,7 +359,7 @@
     let flowObj = Object.assign({}, flowData);
 
     if (!checkFlow()) return;
-    flowObj.status = unref(flowConfig).flowStatus.SAVE;
+    flowObj.status = FlowStatusEnum.SAVE;
     message.success('保存流程成功！请查看控制台。');
     console.log(flowObj);
   }

@@ -19,9 +19,9 @@
 <script lang="ts" setup>
   import { ref, unref } from 'vue';
   import { JsonViewer } from 'vue3-json-viewer';
-  import { flowConfig } from '/@/config/flow';
   import 'vue3-json-viewer/dist/index.css';
   import { ChangeEvent } from 'ant-design-vue/lib/_util/EventInterface';
+  import { FlowStatusEnum } from '/@/type/enums';
 
   const props = defineProps({
     testVisible: {
@@ -50,7 +50,7 @@
   // 暂存
   function tempSave() {
     let tempObj = Object.assign({}, props.flowData);
-    tempObj.status = flowConfig.flowStatus.SAVE;
+    tempObj.status = FlowStatusEnum.SAVE;
     flowDataJson.value = JSON.stringify(tempObj);
   }
 

@@ -1,4 +1,5 @@
-import { flowConfig } from '/@/config/flow';
+import { idType as flowIdType } from '/@/config/flow';
+import { IdTypeEnum } from '/@/type/enums';
 
 export const utils = {
   seqNo: 1,
@@ -10,19 +11,20 @@ export const utils = {
     console.log('%c' + log, 'color: red; font-weight: bold;');
   },
   getId: function () {
-    const idType = flowConfig.idType;
-    if (typeof idType == 'string') {
-      if (idType == 'uuid') {
+    const idType = flowIdType;
+
+    if (typeof idType === 'string') {
+      if (idType === IdTypeEnum.UUID) {
         return this.getUUID();
-      } else if (idType == 'time_stamp') {
+      } else if (idType === IdTypeEnum.TIME_STAMP) {
         return this.getTimeStamp();
       }
     } else if (idType instanceof Array) {
-      if (idType[0] == 'time_stamp_and_sequence') {
+      if (idType[0] === IdTypeEnum.SEQUENCE) {
         return this.getSequence(idType[1]);
-      } else if (idType[0] == 'time_stamp_and_sequence') {
+      } else if (idType[0] === IdTypeEnum.TIME_STAMP_AND_SEQUENCE) {
         return this.getTimeStampAndSequence(idType[1]);
-      } else if (idType[0] == 'custom') {
+      } else if (idType[0] === IdTypeEnum.CUSTOM) {
         return idType[1]();
       }
     }

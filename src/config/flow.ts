@@ -1,3 +1,5 @@
+import { IdTypeEnum } from '/@/type/enums';
+
 export const settingConfig = {
   containerScale: {
     onceNarrow: 0.1,
@@ -96,6 +98,6 @@ export const flowConfig = {
     movePx: settingConfig.other.movePx,
     photoBlankDistance: 200,
   },
-  // ID的生成类型。1.uuid uuid 2.time_stamp 时间戳 3.sequence 序列 4.time_stamp_and_sequence 时间戳加序列 5.custom 自定义
-  idType: 'uuid',
 };
+
+export const idType = IdTypeEnum.UUID;

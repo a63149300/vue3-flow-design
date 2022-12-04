@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { jsPlumb, Defaults } from 'jsplumb';
+  import { jsPlumb } from 'jsplumb';
   import { reactive, ref, onMounted, nextTick, unref } from 'vue';
   import { message } from 'ant-design-vue';
   import { cloneDeep } from 'lodash-es';
@@ -223,7 +223,7 @@
 
   // 实例化JsPlumb
   function initJsPlumb() {
-    plumb.value = jsPlumb.getInstance(unref(flowConfig).jsPlumbInsConfig as unknown as Defaults);
+    plumb.value = jsPlumb.getInstance(unref(flowConfig).jsPlumbInsConfig);
 
     unref(plumb).bind('beforeDrop', (info: Recordable) => {
       let sourceId = info.sourceId;

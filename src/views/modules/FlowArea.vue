@@ -406,7 +406,7 @@
     nodeList.forEach((node: INode) => {
       if (node.y >= ay && node.x >= ax && node.y <= by && node.x <= bx) {
         props.plumb.addToDragSelection(node.id);
-        currentSelectGroup.value.push(node);
+        unref(currentSelectGroup).push(node);
       }
     });
   }
@@ -481,7 +481,7 @@
             {
               handler: () => {
                 verticaLeft({
-                  currentSelectGroup: props.selectGroup,
+                  currentSelectGroup: unref(currentSelectGroup),
                   flowData: props.data,
                   flowConfig: props.config,
                   plumb: props.plumb,
@@ -492,7 +492,7 @@
             {
               handler: () => {
                 verticalCenter({
-                  currentSelectGroup: props.selectGroup,
+                  currentSelectGroup: unref(currentSelectGroup),
                   flowData: props.data,
                   flowConfig: props.config,
                   plumb: props.plumb,
@@ -503,7 +503,7 @@
             {
               handler: () => {
                 verticalRight({
-                  currentSelectGroup: props.selectGroup,
+                  currentSelectGroup: unref(currentSelectGroup),
                   flowData: props.data,
                   flowConfig: props.config,
                   plumb: props.plumb,
@@ -514,7 +514,7 @@
             {
               handler: () => {
                 horizontalUp({
-                  currentSelectGroup: props.selectGroup,
+                  currentSelectGroup: unref(currentSelectGroup),
                   flowData: props.data,
                   flowConfig: props.config,
                   plumb: props.plumb,
@@ -525,7 +525,7 @@
             {
               handler: () => {
                 horizontalCenter({
-                  currentSelectGroup: props.selectGroup,
+                  currentSelectGroup: unref(currentSelectGroup),
                   flowData: props.data,
                   flowConfig: props.config,
                   plumb: props.plumb,
@@ -536,7 +536,7 @@
             {
               handler: () => {
                 horizontalDown({
-                  currentSelectGroup: props.selectGroup,
+                  currentSelectGroup: unref(currentSelectGroup),
                   flowData: props.data,
                   flowConfig: props.config,
                   plumb: props.plumb,
@@ -590,7 +590,7 @@
       newNode.x = nodePos.x;
       newNode.y = nodePos.y;
       dis += 20;
-      flowData.value.nodeList.push(newNode);
+      unref(flowData).nodeList.push(newNode);
       emits('update:data', unref(flowData));
     });
   }
@@ -599,7 +599,7 @@
   function selectAll() {
     unref(flowData).nodeList.forEach((node: INode) => {
       props.plumb.addToDragSelection(node.id);
-      currentSelectGroup.value.push(node);
+      unref(currentSelectGroup).push(node);
     });
   }
 
@@ -611,9 +611,9 @@
   // 复制节点
   function copyNode() {
     clipboard = [];
-    if (currentSelectGroup.value.length > 0) {
-      clipboard = Object.assign([], currentSelectGroup.value);
-    } else if (currentSelect.value.id) {
+    if (unref(currentSelectGroup).length > 0) {
+      clipboard = Object.assign([], unref(currentSelectGroup));
+    } else if (unref(currentSelect).id) {
       clipboard.push(unref(currentSelect) as INode);
     }
   }
@@ -637,7 +637,7 @@
 
     arr.push(Object.assign({}, unref(currentSelect) as INode));
 
-    flowData.value.status = FlowStatusEnum.LOADING;
+    unref(flowData).status = FlowStatusEnum.LOADING;
 
     arr.forEach((c) => {
       let conns = getConnectionsByNodeId(c.id);
@@ -658,7 +658,7 @@
       let inx = nodeList.findIndex((node: INode) => node.id === c.id);
       nodeList.splice(inx, 1);
     });
-    flowData.value.status = FlowStatusEnum.CREATE;
+    unref(flowData).status = FlowStatusEnum.CREATE;
     emits('update:data', unref(flowData));
     selectContainer();
   }
@@ -680,7 +680,7 @@
   // 更新组节点信息
   function updateNodePos() {
     let nodeList = unref(flowData).nodeList;
-    currentSelectGroup.value.forEach((node) => {
+    unref(currentSelectGroup).forEach((node) => {
       let dom = document.querySelector('#' + node.id) as HTMLElement;
       let l = parseInt(dom?.style?.left);
       let t = parseInt(dom?.style?.top);
@@ -692,7 +692,7 @@
 
   // 计算辅助线
   function alignForLine(e: Recordable) {
-    if (props.selectGroup.length > 1) return;
+    if (unref(currentSelectGroup).length > 1) return;
     if (container.auxiliaryLine.controlFnTimesFlag) {
       let elId = e.el.id;
       let nodeList = unref(flowData).nodeList;
@@ -760,9 +760,9 @@
   );
 
   watch(
-    () => currentSelect,
-    (currentSelect) => {
-      emits('update:select', currentSelect.value);
+    () => currentSelect.value,
+    (val) => {
+      emits('update:select', val);
     },
     { deep: true },
   );
@@ -776,9 +776,9 @@
   );
 
   watch(
-    () => currentSelectGroup,
-    (currentSelectGroup) => {
-      emits('update:selectGroup', currentSelectGroup.value);
+    () => currentSelectGroup.value,
+    (val) => {
+      emits('update:selectGroup', val);
     },
     { deep: true },
   );

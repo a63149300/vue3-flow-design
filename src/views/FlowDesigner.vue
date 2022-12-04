@@ -184,7 +184,7 @@
           source: link.sourceId,
           target: link.targetId,
           anchor: unref(flowConfig).jsPlumbConfig.anchor.default,
-          connector: [link.cls.linkType, unref(flowConfig).jsPlumbInsConfig.Connector[1]],
+          connector: [link.cls.linkType, unref(flowConfig).jsPlumbInsConfig.Connector?.[1]],
           paintStyle: {
             stroke: link.cls.linkColor,
             strokeWidth: link.cls.linkThickness,
@@ -260,9 +260,9 @@
       o.targetId = conn.targetId;
       o.label = label;
       o.cls = {
-        linkType: unref(flowConfig).jsPlumbInsConfig.Connector[0],
-        linkColor: unref(flowConfig).jsPlumbInsConfig.PaintStyle.stroke,
-        linkThickness: unref(flowConfig).jsPlumbInsConfig.PaintStyle.strokeWidth,
+        linkType: unref(flowConfig).jsPlumbInsConfig.Connector?.[0],
+        linkColor: unref(flowConfig).jsPlumbInsConfig.PaintStyle?.stroke,
+        linkThickness: unref(flowConfig).jsPlumbInsConfig.PaintStyle?.strokeWidth,
       };
       document.querySelector('#' + id)?.addEventListener('contextmenu', (e: Event) => {
         showLinkContextMenu(e);

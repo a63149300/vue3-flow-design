@@ -404,6 +404,7 @@
         break;
       case 'down':
         isX = false;
+        break;
     }
 
     if (unref(currentSelectGroup).length > 0) {
@@ -435,6 +436,7 @@
     flowData.linkList = [];
   }
 
+  // 清除当前选择节点
   function clearSelect() {
     currentSelect.value = undefined;
     currentSelectGroup.value = [];

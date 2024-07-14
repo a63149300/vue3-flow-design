@@ -1,14 +1,14 @@
-import { ToolsTypeEnum } from '/@/type/enums';
+import { ActionsTypeEnum } from '/@/type/enums';
 import { ITool } from '/@/type/index';
 
 export const tools: ITool[] = [
   {
-    type: ToolsTypeEnum.DRAG,
+    type: ActionsTypeEnum.DRAG,
     nodeName: '拖拽',
     icon: 'DragOutlined',
   },
   {
-    type: ToolsTypeEnum.CONNECTION,
+    type: ActionsTypeEnum.CONNECTION,
     nodeName: '连线',
     icon: 'ForkOutlined',
   },

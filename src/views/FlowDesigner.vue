@@ -89,7 +89,7 @@
   import FlowFooter from './modules/FlowFooter.vue';
   import { tools } from '/@/config/tools';
   import { IDragInfo, INode, ILink, ITool } from '/@/type/index';
-  import { ToolsTypeEnum, LaneNodeTypeEnum, FlowStatusEnum } from '/@/type/enums';
+  import { ActionsTypeEnum, LaneNodeTypeEnum, FlowStatusEnum } from '/@/type/enums';
   import { utils, setFlowConfig } from '/@/utils/common';
   import { useContextMenu } from '/@/hooks/useContextMenu';
   import { useGenerateFlowImage } from '/@/hooks/useGenerateFlowImage';
@@ -299,15 +299,15 @@
   }
 
   // 设置工具
-  function selectTool(type: ToolsTypeEnum) {
+  function selectTool(type: ActionsTypeEnum) {
     let tool = tools.find((t) => t.type === type);
     if (tool) currentTool.value = tool;
 
     switch (type) {
-      case ToolsTypeEnum.DRAG:
+      case ActionsTypeEnum.DRAG:
         changeToDrag();
         break;
-      case ToolsTypeEnum.CONNECTION:
+      case ActionsTypeEnum.CONNECTION:
         changeToConnection();
         break;
     }

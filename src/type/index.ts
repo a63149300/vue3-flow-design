@@ -1,5 +1,5 @@
 import {
-  ToolsTypeEnum,
+  ActionsTypeEnum,
   NodeTypeEnum,
   CommonNodeTypeEnum,
   HighNodeTypeEnum,
@@ -16,7 +16,7 @@ export interface IDragInfo {
 }
 
 export interface ITool {
-  type: ToolsTypeEnum;
+  type: ActionsTypeEnum;
   nodeName: string;
   icon: string;
 }

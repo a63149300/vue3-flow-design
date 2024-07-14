@@ -1,8 +1,10 @@
-export enum ToolsTypeEnum {
+// 操作类型
+export enum ActionsTypeEnum {
   DRAG = 'drag',
   CONNECTION = 'connection',
 }
 
+// 元素类型
 export enum NodeTypeEnum {
   Common_Node_Type = 'CommonNodeType',
   High_Node_Type = 'HighNodeType',
@@ -41,4 +43,10 @@ export enum IdTypeEnum {
   SEQUENCE = 'sequence',
   TIME_STAMP_AND_SEQUENCE = 'time_stamp_and_sequence',
   CUSTOM = 'custom',
+}
+
+export enum ActiveTypeEnum {
+  CANVAS = 'canvas',
+  CONNECTION = 'connection',
+  NODE = 'node',
 }

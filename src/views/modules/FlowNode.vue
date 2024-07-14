@@ -111,7 +111,7 @@
     CommonNodeTypeEnum,
     HighNodeTypeEnum,
     LaneNodeTypeEnum,
-    ToolsTypeEnum,
+    ActionsTypeEnum,
   } from '/@/type/enums';
   import { INode, ILink, ITool, NodesType } from '/@/type/index';
 
@@ -179,7 +179,7 @@
   }
 
   // 设置鼠标样式
-  function setCursor(type: ToolsTypeEnum) {
+  function setCursor(type: ActionsTypeEnum) {
     switch (type) {
       case 'drag':
         return 'move';

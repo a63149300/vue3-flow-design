@@ -1,4 +1,4 @@
-import { ToolsTypeEnum } from '/@/type/enums';
+import { ActionsTypeEnum } from '/@/type/enums';
 import { shortcutKeys } from '/@/config/shortcutKeys';
 
 export function useShortcutKey() {
@@ -21,10 +21,10 @@ export function useShortcutKey() {
           flowAreaRef.container.dragFlag = true;
           break;
         case shortcutKeys.dragTool.code:
-          handler.selectTool(ToolsTypeEnum.DRAG);
+          handler.selectTool(ActionsTypeEnum.DRAG);
           break;
         case shortcutKeys.connTool.code:
-          handler.selectTool(ToolsTypeEnum.CONNECTION);
+          handler.selectTool(ActionsTypeEnum.CONNECTION);
           break;
         case shortcutKeys.leftMove.code:
           handler.moveNode('left');

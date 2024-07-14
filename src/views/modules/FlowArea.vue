@@ -83,7 +83,7 @@
   import {
     CommonNodeTypeEnum,
     LaneNodeTypeEnum,
-    ToolsTypeEnum,
+    ActionsTypeEnum,
     NodeTypeEnum,
     FlowStatusEnum,
   } from '/@/type/enums';
@@ -258,7 +258,7 @@
   // 组件拖拽入画布
   function handleDrop() {
     // 复位拖拽工具
-    emits('selectTool', ToolsTypeEnum.DRAG);
+    emits('selectTool', ActionsTypeEnum.DRAG);
 
     findNodeConfig(props.dragInfo);
   }

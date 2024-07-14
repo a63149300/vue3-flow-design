@@ -1,7 +1,7 @@
 <template>
   <a-tabs size="small" :activeKey="activeKey">
     <!-- 流程属性 -->
-    <a-tab-pane key="flow-attr">
+    <a-tab-pane :key="ActiveTypeEnum.CANVAS" v-if="activeKey === ActiveTypeEnum.CANVAS">
       <template #tab>
         <span>
           <component :is="'ClusterOutlined'" />
@@ -14,8 +14,9 @@
         </a-form-item>
       </a-form>
     </a-tab-pane>
+
     <!-- 节点属性 -->
-    <a-tab-pane key="node-attr">
+    <a-tab-pane :key="ActiveTypeEnum.NODE" v-if="activeKey === ActiveTypeEnum.NODE">
       <template #tab>
         <span>
           <component :is="'ProfileOutlined'" />
@@ -38,8 +39,9 @@
         </a-form-item>
       </a-form>
     </a-tab-pane>
+
     <!-- 连线属性 -->
-    <a-tab-pane key="link-attr">
+    <a-tab-pane :key="ActiveTypeEnum.CONNECTION" v-if="activeKey === ActiveTypeEnum.CONNECTION">
       <template #tab>
         <span>
           <component :is="'BranchesOutlined'" />
@@ -68,7 +70,7 @@
   import { ChangeEvent } from 'ant-design-vue/lib/_util/EventInterface';
   import { ref, watch, unref, PropType } from 'vue';
   import { INode, ILink, NodesType } from '/@/type/index';
-  import { CommonNodeTypeEnum } from '/@/type/enums';
+  import { CommonNodeTypeEnum, ActiveTypeEnum } from '/@/type/enums';
 
   const props = defineProps({
     plumb: {
@@ -89,7 +91,7 @@
 
   const currentSelect = ref<INode | ILink>(props.select);
 
-  const activeKey = ref<string>('flow-attr');
+  const activeKey = ref<string>(ActiveTypeEnum.CANVAS);
 
   // 修改节点名称
   function nodeNameChange(e: ChangeEvent) {
@@ -141,11 +143,11 @@
     (val) => {
       currentSelect.value = val;
       if (!unref(currentSelect)?.type) {
-        activeKey.value = 'flow-attr';
+        activeKey.value = ActiveTypeEnum.CANVAS;
       } else if (unref(currentSelect)?.type === 'link') {
-        activeKey.value = 'link-attr';
+        activeKey.value = ActiveTypeEnum.CONNECTION;
       } else {
-        activeKey.value = 'node-attr';
+        activeKey.value = ActiveTypeEnum.NODE;
       }
     },
     { deep: true },
